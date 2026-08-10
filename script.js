@@ -1,21 +1,21 @@
 ```javascript
 // ==========================================
-// GOOGLE APPS SCRIPT API URL
+// GOOGLE APPS SCRIPT WEB APP URL
 // ==========================================
 
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbxVstLrM6sNMTmZCHBd70cQ8UaBFmWH3HGeKzuoW4bm9ZquYT_QbaBxTMr8AffuQtnt/exec";
+  "https://script.google.com/macros/s/AKfycbxjB_UE4XCH7JFZRHLHxwZZ-AJ6W3KljIcFRiAMIbCt1JXKuT3KmBf0TqlKnSH61hpV/exec";
 
 
 // ==========================================
-// DATA
+// VARIABLES
 // ==========================================
 
 let records = [];
 
 
 // ==========================================
-// PAGE LOAD
+// START
 // ==========================================
 
 document.addEventListener(
@@ -33,7 +33,7 @@ document.addEventListener(
 
 
 // ==========================================
-// LOAD RECORDS
+// READ
 // ==========================================
 
 async function loadRecords() {
@@ -49,23 +49,21 @@ async function loadRecords() {
       );
 
 
-    const data =
+    const result =
       await response.json();
 
 
-    if (
-      !Array.isArray(data)
-    ) {
+    if (!result.success) {
 
       throw new Error(
-        "Invalid response from server."
+        result.message
       );
 
     }
 
 
     records =
-      data;
+      result.records || [];
 
 
     renderRecords(
@@ -79,7 +77,7 @@ async function loadRecords() {
     console.error(error);
 
     showMessage(
-      "Failed to load records: " +
+      "Unable to load records: " +
       error.message,
       "error"
     );
@@ -99,52 +97,49 @@ async function loadRecords() {
 // CREATE
 // ==========================================
 
-async function createRecord(
-  data
-) {
+async function createRecord(data) {
+
+  const params =
+    new URLSearchParams();
+
+
+  params.append(
+    "action",
+    "create"
+  );
+
+
+  params.append(
+    "name",
+    data.name
+  );
+
+
+  params.append(
+    "email",
+    data.email
+  );
+
+
+  params.append(
+    "phone",
+    data.phone
+  );
+
+
+  params.append(
+    "status",
+    data.status
+  );
+
 
   try {
-
-    const params =
-      new URLSearchParams();
-
-
-    params.append(
-      "action",
-      "create"
-    );
-
-
-    params.append(
-      "name",
-      data.name
-    );
-
-
-    params.append(
-      "email",
-      data.email
-    );
-
-
-    params.append(
-      "phone",
-      data.phone
-    );
-
-
-    params.append(
-      "status",
-      data.status
-    );
-
 
     const response =
       await fetch(
         API_URL,
         {
           method: "POST",
-
           body: params
         }
       );
@@ -170,7 +165,6 @@ async function createRecord(
 
 
     resetForm();
-
 
     await loadRecords();
 
@@ -194,58 +188,55 @@ async function createRecord(
 // UPDATE
 // ==========================================
 
-async function updateRecord(
-  data
-) {
+async function updateRecord(data) {
+
+  const params =
+    new URLSearchParams();
+
+
+  params.append(
+    "action",
+    "update"
+  );
+
+
+  params.append(
+    "id",
+    data.id
+  );
+
+
+  params.append(
+    "name",
+    data.name
+  );
+
+
+  params.append(
+    "email",
+    data.email
+  );
+
+
+  params.append(
+    "phone",
+    data.phone
+  );
+
+
+  params.append(
+    "status",
+    data.status
+  );
+
 
   try {
-
-    const params =
-      new URLSearchParams();
-
-
-    params.append(
-      "action",
-      "update"
-    );
-
-
-    params.append(
-      "id",
-      data.id
-    );
-
-
-    params.append(
-      "name",
-      data.name
-    );
-
-
-    params.append(
-      "email",
-      data.email
-    );
-
-
-    params.append(
-      "phone",
-      data.phone
-    );
-
-
-    params.append(
-      "status",
-      data.status
-    );
-
 
     const response =
       await fetch(
         API_URL,
         {
           method: "POST",
-
           body: params
         }
       );
@@ -272,7 +263,6 @@ async function updateRecord(
 
     resetForm();
 
-
     await loadRecords();
 
   }
@@ -295,9 +285,7 @@ async function updateRecord(
 // DELETE
 // ==========================================
 
-async function deleteRecord(
-  id
-) {
+async function deleteRecord(id) {
 
   if (
     !confirm(
@@ -310,30 +298,29 @@ async function deleteRecord(
   }
 
 
+  const params =
+    new URLSearchParams();
+
+
+  params.append(
+    "action",
+    "delete"
+  );
+
+
+  params.append(
+    "id",
+    id
+  );
+
+
   try {
-
-    const params =
-      new URLSearchParams();
-
-
-    params.append(
-      "action",
-      "delete"
-    );
-
-
-    params.append(
-      "id",
-      id
-    );
-
 
     const response =
       await fetch(
         API_URL,
         {
           method: "POST",
-
           body: params
         }
       );
@@ -390,20 +377,17 @@ function setupForm() {
 
   form.addEventListener(
     "submit",
-    function (event) {
+    function(event) {
 
       event.preventDefault();
 
 
-      const id =
-        document.getElementById(
-          "recordId"
-        ).value;
-
-
       const data = {
 
-        id: id,
+        id:
+          document.getElementById(
+            "recordId"
+          ).value,
 
         name:
           document.getElementById(
@@ -458,11 +442,10 @@ function setupForm() {
         );
 
 
-      button.disabled =
-        true;
+      button.disabled = true;
 
 
-      if (id) {
+      if (data.id) {
 
         updateRecord(
           data
@@ -478,17 +461,6 @@ function setupForm() {
 
       }
 
-
-      setTimeout(
-        function () {
-
-          button.disabled =
-            false;
-
-        },
-        1000
-      );
-
     }
   );
 
@@ -499,16 +471,14 @@ function setupForm() {
 // EDIT
 // ==========================================
 
-function editRecord(
-  id
-) {
+function editRecord(id) {
 
   const record =
     records.find(
-      function (item) {
+      function(record) {
 
         return String(
-          item.id
+          record.id
         ) === String(id);
 
       }
@@ -629,7 +599,7 @@ function setupSearch() {
 
 function searchRecords() {
 
-  const search =
+  const keyword =
     document
       .getElementById(
         "searchInput"
@@ -639,7 +609,7 @@ function searchRecords() {
       .trim();
 
 
-  if (!search) {
+  if (!keyword) {
 
     renderRecords(
       records
@@ -652,47 +622,37 @@ function searchRecords() {
 
   const filtered =
     records.filter(
-      function (record) {
+      function(record) {
 
         return (
 
-          String(
-            record.id
-          )
+          String(record.id)
             .toLowerCase()
-            .includes(search)
+            .includes(keyword)
 
           ||
 
-          String(
-            record.name
-          )
+          String(record.name)
             .toLowerCase()
-            .includes(search)
+            .includes(keyword)
 
           ||
 
-          String(
-            record.email
-          )
+          String(record.email)
             .toLowerCase()
-            .includes(search)
+            .includes(keyword)
 
           ||
 
-          String(
-            record.phone
-          )
+          String(record.phone)
             .toLowerCase()
-            .includes(search)
+            .includes(keyword)
 
           ||
 
-          String(
-            record.status
-          )
+          String(record.status)
             .toLowerCase()
-            .includes(search)
+            .includes(keyword)
 
         );
 
@@ -708,12 +668,10 @@ function searchRecords() {
 
 
 // ==========================================
-// RENDER TABLE
+// RENDER
 // ==========================================
 
-function renderRecords(
-  data
-) {
+function renderRecords(data) {
 
   const table =
     document.getElementById(
@@ -721,8 +679,7 @@ function renderRecords(
     );
 
 
-  table.innerHTML =
-    "";
+  table.innerHTML = "";
 
 
   if (
@@ -751,7 +708,7 @@ function renderRecords(
 
 
   data.forEach(
-    function (record) {
+    function(record) {
 
       const row =
         document.createElement(
@@ -759,57 +716,36 @@ function renderRecords(
         );
 
 
-      const statusClass =
-        record.status ===
-        "Active"
-
-          ? "status-active"
-
-          : "status-inactive";
-
-
       row.innerHTML = `
 
         <td>
-          ${escapeHtml(
-            record.id
-          )}
+          ${escapeHtml(record.id)}
         </td>
 
         <td>
-          ${escapeHtml(
-            record.name
-          )}
+          ${escapeHtml(record.name)}
         </td>
 
         <td>
-          ${escapeHtml(
-            record.email
-          )}
+          ${escapeHtml(record.email)}
         </td>
 
         <td>
-          ${escapeHtml(
-            record.phone
-          )}
+          ${escapeHtml(record.phone)}
         </td>
 
         <td>
-
-          <span
-            class="status ${statusClass}"
-          >
-            ${escapeHtml(
-              record.status
-            )}
+          <span class="status ${
+            record.status === "Active"
+              ? "status-active"
+              : "status-inactive"
+          }">
+            ${escapeHtml(record.status)}
           </span>
-
         </td>
 
         <td>
-          ${escapeHtml(
-            record.createdAt
-          )}
+          ${escapeHtml(record.createdAt)}
         </td>
 
         <td>
@@ -851,14 +787,15 @@ function renderRecords(
 // LOADING
 // ==========================================
 
-function showLoading(
-  show
-) {
+function showLoading(show) {
 
   const loading =
     document.getElementById(
       "loading"
     );
+
+
+  if (!loading) return;
 
 
   loading.style.display =
@@ -906,13 +843,13 @@ function showMessage(
 
 
   setTimeout(
-    function () {
+    function() {
 
       element.style.display =
         "none";
 
     },
-    3500
+    3000
   );
 
 }
@@ -922,9 +859,7 @@ function showMessage(
 // SECURITY
 // ==========================================
 
-function escapeHtml(
-  value
-) {
+function escapeHtml(value) {
 
   if (
     value === null ||
@@ -966,9 +901,7 @@ function escapeHtml(
 }
 
 
-function escapeJs(
-  value
-) {
+function escapeJs(value) {
 
   return String(value)
 
