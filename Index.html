@@ -1,26 +1,16 @@
 <!DOCTYPE html>
-
 <html>
 
 <head>
 
   <base target="_top">
 
-  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <title>CRUD Management System</title>
-
+  <title>Form Management System</title>
 
   <style>
-
-    /* =========================================
-       RESET
-       ========================================= */
 
     * {
       box-sizing: border-box;
@@ -28,783 +18,259 @@
       padding: 0;
     }
 
-
-    /* =========================================
-       BODY
-       ========================================= */
-
     body {
-
-      font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
-      background:
-        #f1f5f9;
-
-      color:
-        #1e293b;
-
-      min-height:
-        100vh;
-
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f6f9;
+      color: #222;
     }
-
-
-    /* =========================================
-       CONTAINER
-       ========================================= */
 
     .container {
-
-      width:
-        95%;
-
-      max-width:
-        1250px;
-
-      margin:
-        30px auto;
-
+      width: 95%;
+      max-width: 1200px;
+      margin: 40px auto;
     }
-
-
-    /* =========================================
-       HEADER
-       ========================================= */
 
     .header {
-
-      background:
-        linear-gradient(
-          135deg,
-          #2563eb,
-          #1e40af
-        );
-
-      color:
-        white;
-
-      padding:
-        30px;
-
-      border-radius:
-        14px 14px 0 0;
-
-      box-shadow:
-        0 5px 20px
-        rgba(0,0,0,0.08);
-
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: white;
+      padding: 25px;
+      border-radius: 12px 12px 0 0;
     }
-
 
     .header h1 {
-
-      font-size:
-        28px;
-
-      margin-bottom:
-        7px;
-
+      margin-bottom: 5px;
     }
-
 
     .header p {
-
-      opacity:
-        0.9;
-
-      font-size:
-        14px;
-
+      opacity: 0.9;
     }
-
-
-    /* =========================================
-       CARD
-       ========================================= */
 
     .card {
-
-      background:
-        white;
-
-      padding:
-        25px;
-
-      box-shadow:
-        0 5px 20px
-        rgba(0,0,0,0.06);
-
+      background: white;
+      padding: 25px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
     }
 
-
-    /* =========================================
-       FORM
-       ========================================= */
+    /* FORM */
 
     .form-grid {
-
-      display:
-        grid;
-
-      grid-template-columns:
-        repeat(2, 1fr);
-
-      gap:
-        18px;
-
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
     }
-
 
     .form-group {
-
-      display:
-        flex;
-
-      flex-direction:
-        column;
-
+      display: flex;
+      flex-direction: column;
     }
-
 
     .form-group.full {
-
-      grid-column:
-        1 / -1;
-
+      grid-column: 1 / -1;
     }
-
 
     label {
-
-      font-size:
-        14px;
-
-      font-weight:
-        bold;
-
-      margin-bottom:
-        7px;
-
-      color:
-        #334155;
-
+      margin-bottom: 7px;
+      font-weight: bold;
+      font-size: 14px;
     }
-
 
     input,
     select {
-
-      width:
-        100%;
-
-      padding:
-        12px 14px;
-
-      border:
-        1px solid #cbd5e1;
-
-      border-radius:
-        8px;
-
-      font-size:
-        14px;
-
-      outline:
-        none;
-
-      transition:
-        0.2s;
-
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 7px;
+      font-size: 15px;
+      outline: none;
     }
-
 
     input:focus,
     select:focus {
-
-      border-color:
-        #2563eb;
-
-      box-shadow:
-        0 0 0 3px
-        rgba(37,99,235,0.1);
-
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
     }
-
-
-    /* =========================================
-       BUTTONS
-       ========================================= */
 
     .buttons {
-
-      display:
-        flex;
-
-      gap:
-        10px;
-
-      margin-top:
-        20px;
-
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
     }
-
 
     button {
-
-      border:
-        none;
-
-      border-radius:
-        7px;
-
-      padding:
-        11px 18px;
-
-      cursor:
-        pointer;
-
-      font-size:
-        14px;
-
-      font-weight:
-        bold;
-
-      transition:
-        0.2s;
-
+      border: none;
+      padding: 11px 18px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
     }
-
-
-    button:hover {
-
-      transform:
-        translateY(-1px);
-
-    }
-
-
-    button:disabled {
-
-      opacity:
-        0.6;
-
-      cursor:
-        not-allowed;
-
-      transform:
-        none;
-
-    }
-
 
     .btn-primary {
-
-      background:
-        #2563eb;
-
-      color:
-        white;
-
+      background: #2563eb;
+      color: white;
     }
-
 
     .btn-primary:hover {
-
-      background:
-        #1d4ed8;
-
+      background: #1d4ed8;
     }
-
 
     .btn-secondary {
-
-      background:
-        #64748b;
-
-      color:
-        white;
-
+      background: #6b7280;
+      color: white;
     }
-
 
     .btn-secondary:hover {
-
-      background:
-        #475569;
-
+      background: #4b5563;
     }
-
 
     .btn-edit {
-
-      background:
-        #f59e0b;
-
-      color:
-        white;
-
+      background: #f59e0b;
+      color: white;
     }
-
-
-    .btn-edit:hover {
-
-      background:
-        #d97706;
-
-    }
-
 
     .btn-delete {
-
-      background:
-        #dc2626;
-
-      color:
-        white;
-
+      background: #dc2626;
+      color: white;
     }
 
-
-    .btn-delete:hover {
-
-      background:
-        #b91c1c;
-
-    }
-
-
-    /* =========================================
-       RECORD SECTION
-       ========================================= */
-
-    .records-card {
-
-      margin-top:
-        25px;
-
-      border-radius:
-        0 0 14px 14px;
-
-    }
-
+    /* TABLE */
 
     .table-header {
-
-      display:
-        flex;
-
-      justify-content:
-        space-between;
-
-      align-items:
-        center;
-
-      gap:
-        20px;
-
-      margin-bottom:
-        20px;
-
+      margin-top: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 15px;
     }
-
 
     .table-header h2 {
-
-      font-size:
-        21px;
-
+      font-size: 20px;
     }
 
-
-    .search-box {
-
-      width:
-        320px;
-
-      max-width:
-        100%;
-
+    .search {
+      width: 300px;
+      max-width: 100%;
     }
-
-
-    /* =========================================
-       TABLE
-       ========================================= */
 
     .table-wrapper {
-
-      overflow-x:
-        auto;
-
+      overflow-x: auto;
     }
-
 
     table {
-
-      width:
-        100%;
-
-      border-collapse:
-        collapse;
-
-      min-width:
-        900px;
-
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 850px;
     }
-
 
     th {
-
-      background:
-        #0f172a;
-
-      color:
-        white;
-
-      text-align:
-        left;
-
-      padding:
-        13px;
-
-      font-size:
-        13px;
-
-      white-space:
-        nowrap;
-
+      background: #111827;
+      color: white;
+      padding: 13px;
+      text-align: left;
+      font-size: 13px;
     }
-
 
     td {
-
-      padding:
-        12px;
-
-      border-bottom:
-        1px solid #e2e8f0;
-
-      font-size:
-        13px;
-
-      vertical-align:
-        middle;
-
+      padding: 12px;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 14px;
     }
 
-
-    tbody tr:hover {
-
-      background:
-        #f8fafc;
-
+    tr:hover {
+      background: #f9fafb;
     }
-
-
-    /* =========================================
-       STATUS
-       ========================================= */
 
     .status {
-
-      display:
-        inline-block;
-
-      padding:
-        5px 10px;
-
-      border-radius:
-        20px;
-
-      font-size:
-        11px;
-
-      font-weight:
-        bold;
-
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
     }
-
 
     .status-active {
-
-      background:
-        #dcfce7;
-
-      color:
-        #166534;
-
+      background: #dcfce7;
+      color: #166534;
     }
-
 
     .status-inactive {
-
-      background:
-        #fee2e2;
-
-      color:
-        #991b1b;
-
+      background: #fee2e2;
+      color: #991b1b;
     }
-
-
-    /* =========================================
-       ACTIONS
-       ========================================= */
 
     .action-buttons {
-
-      display:
-        flex;
-
-      gap:
-        5px;
-
+      display: flex;
+      gap: 5px;
     }
-
 
     .action-buttons button {
-
-      padding:
-        7px 10px;
-
-      font-size:
-        12px;
-
+      padding: 7px 10px;
+      font-size: 12px;
     }
 
-
-    /* =========================================
-       LOADING
-       ========================================= */
+    /* LOADING */
 
     .loading {
-
-      display:
-        none;
-
-      text-align:
-        center;
-
-      padding:
-        20px;
-
-      color:
-        #2563eb;
-
-      font-weight:
-        bold;
-
+      display: none;
+      text-align: center;
+      padding: 20px;
+      color: #2563eb;
+      font-weight: bold;
     }
 
-
-    .spinner {
-
-      display:
-        inline-block;
-
-      width:
-        18px;
-
-      height:
-        18px;
-
-      border:
-        3px solid #dbeafe;
-
-      border-top:
-        3px solid #2563eb;
-
-      border-radius:
-        50%;
-
-      animation:
-        spin 1s linear infinite;
-
-      vertical-align:
-        middle;
-
-      margin-right:
-        8px;
-
-    }
-
-
-    @keyframes spin {
-
-      0% {
-        transform:
-          rotate(0deg);
-      }
-
-      100% {
-        transform:
-          rotate(360deg);
-      }
-
-    }
-
-
-    /* =========================================
-       EMPTY STATE
-       ========================================= */
-
-    .empty {
-
-      text-align:
-        center;
-
-      padding:
-        40px;
-
-      color:
-        #64748b;
-
-    }
-
-
-    /* =========================================
-       NOTIFICATION
-       ========================================= */
+    /* MESSAGE */
 
     #message {
-
-      position:
-        fixed;
-
-      top:
-        20px;
-
-      right:
-        20px;
-
-      max-width:
-        350px;
-
-      padding:
-        14px 18px;
-
-      border-radius:
-        8px;
-
-      color:
-        white;
-
-      display:
-        none;
-
-      z-index:
-        9999;
-
-      box-shadow:
-        0 8px 25px
-        rgba(0,0,0,0.2);
-
-      font-size:
-        14px;
-
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      border-radius: 8px;
+      color: white;
+      display: none;
+      z-index: 9999;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
     }
 
-
-    #message.success {
-
-      background:
-        #16a34a;
-
+    .success {
+      background: #16a34a;
     }
 
-
-    #message.error {
-
-      background:
-        #dc2626;
-
+    .error {
+      background: #dc2626;
     }
 
-
-    /* =========================================
-       MOBILE
-       ========================================= */
+    /* MOBILE */
 
     @media(max-width: 700px) {
 
       .container {
-
-        width:
-          100%;
-
-        margin:
-          0;
-
+        width: 100%;
+        margin: 0;
       }
-
 
       .header {
-
-        border-radius:
-          0;
-
+        border-radius: 0;
       }
-
 
       .card {
-
-        padding:
-          18px;
-
+        padding: 18px;
       }
-
 
       .form-grid {
-
-        grid-template-columns:
-          1fr;
-
+        grid-template-columns: 1fr;
       }
-
 
       .form-group.full {
-
-        grid-column:
-          auto;
-
+        grid-column: auto;
       }
-
 
       .table-header {
-
-        flex-direction:
-          column;
-
-        align-items:
-          stretch;
-
+        flex-direction: column;
+        align-items: stretch;
       }
 
-
-      .search-box {
-
-        width:
-          100%;
-
-      }
-
-
-      .buttons {
-
-        flex-direction:
-          column;
-
-      }
-
-
-      .buttons button {
-
-        width:
-          100%;
-
+      .search {
+        width: 100%;
       }
 
     }
@@ -816,661 +282,461 @@
 
 <body>
 
+<div class="container">
 
-  <div class="container">
+  <div class="header">
 
+    <h1>Form Management System</h1>
 
-    <!-- =====================================
-         HEADER
-         ====================================== -->
-
-    <div class="header">
-
-      <h1>
-        CRUD Management System
-      </h1>
-
-      <p>
-        Manage records using Google Sheets
-        and Google Apps Script
-      </p>
-
-    </div>
-
-
-    <!-- =====================================
-         FORM
-         ====================================== -->
-
-    <div class="card">
-
-      <form id="recordForm">
-
-        <!-- Hidden ID -->
-
-        <input
-          type="hidden"
-          id="recordId"
-        >
-
-
-        <div class="form-grid">
-
-
-          <!-- NAME -->
-
-          <div class="form-group">
-
-            <label for="name">
-              Name *
-            </label>
-
-            <input
-              type="text"
-              id="name"
-              placeholder="Enter full name"
-              required
-            >
-
-          </div>
-
-
-          <!-- EMAIL -->
-
-          <div class="form-group">
-
-            <label for="email">
-              Email *
-            </label>
-
-            <input
-              type="email"
-              id="email"
-              placeholder="Enter email address"
-              required
-            >
-
-          </div>
-
-
-          <!-- PHONE -->
-
-          <div class="form-group">
-
-            <label for="phone">
-              Phone
-            </label>
-
-            <input
-              type="text"
-              id="phone"
-              placeholder="Enter phone number"
-            >
-
-          </div>
-
-
-          <!-- STATUS -->
-
-          <div class="form-group">
-
-            <label for="status">
-              Status
-            </label>
-
-            <select id="status">
-
-              <option value="Active">
-                Active
-              </option>
-
-              <option value="Inactive">
-                Inactive
-              </option>
-
-            </select>
-
-          </div>
-
-
-        </div>
-
-
-        <!-- FORM BUTTONS -->
-
-        <div class="buttons">
-
-          <button
-            type="submit"
-            class="btn-primary"
-            id="submitButton"
-          >
-            Add Record
-          </button>
-
-
-          <button
-            type="button"
-            class="btn-secondary"
-            onclick="resetForm()"
-          >
-            Clear
-          </button>
-
-        </div>
-
-      </form>
-
-    </div>
-
-
-    <!-- =====================================
-         RECORDS
-         ====================================== -->
-
-    <div class="card records-card">
-
-
-      <div class="table-header">
-
-        <h2>
-          Records
-        </h2>
-
-
-        <input
-          type="text"
-          id="searchInput"
-          class="search-box"
-          placeholder="Search records..."
-          oninput="searchRecords()"
-        >
-
-      </div>
-
-
-      <!-- LOADING -->
-
-      <div
-        id="loading"
-        class="loading"
-      >
-
-        <span class="spinner"></span>
-
-        Loading records...
-
-      </div>
-
-
-      <!-- TABLE -->
-
-      <div class="table-wrapper">
-
-        <table>
-
-          <thead>
-
-            <tr>
-
-              <th>
-                ID
-              </th>
-
-              <th>
-                Name
-              </th>
-
-              <th>
-                Email
-              </th>
-
-              <th>
-                Phone
-              </th>
-
-              <th>
-                Status
-              </th>
-
-              <th>
-                Created
-              </th>
-
-              <th>
-                Updated
-              </th>
-
-              <th>
-                Actions
-              </th>
-
-            </tr>
-
-          </thead>
-
-
-          <tbody id="recordTable">
-
-          </tbody>
-
-        </table>
-
-      </div>
-
-
-    </div>
-
+    <p>
+      Google Apps Script + Google Sheets Database
+    </p>
 
   </div>
 
 
-  <!-- =======================================
-       NOTIFICATION
-       ======================================== -->
+  <!-- FORM -->
 
-  <div id="message"></div>
+  <div class="card">
+
+    <form id="recordForm">
+
+      <input type="hidden" id="recordId">
+
+      <div class="form-grid">
+
+        <div class="form-group">
+
+          <label for="name">
+            Name *
+          </label>
+
+          <input
+            type="text"
+            id="name"
+            placeholder="Enter name"
+            required
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="email">
+            Email *
+          </label>
+
+          <input
+            type="email"
+            id="email"
+            placeholder="Enter email"
+            required
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="phone">
+            Phone
+          </label>
+
+          <input
+            type="text"
+            id="phone"
+            placeholder="Enter phone number"
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="status">
+            Status
+          </label>
+
+          <select id="status">
+
+            <option value="Active">
+              Active
+            </option>
+
+            <option value="Inactive">
+              Inactive
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+
+      <div class="buttons">
+
+        <button
+          type="submit"
+          class="btn-primary"
+          id="submitButton"
+        >
+          Add Record
+        </button>
+
+        <button
+          type="button"
+          class="btn-secondary"
+          onclick="resetForm()"
+        >
+          Clear
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+
+  <!-- RECORDS -->
+
+  <div class="card">
+
+    <div class="table-header">
+
+      <h2>
+        Records
+      </h2>
+
+      <input
+        type="text"
+        class="search"
+        id="searchInput"
+        placeholder="Search records..."
+        onkeyup="searchRecords()"
+      >
+
+    </div>
+
+
+    <div id="loading" class="loading">
+      Loading records...
+    </div>
+
+
+    <div class="table-wrapper">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>ID</th>
+
+            <th>Name</th>
+
+            <th>Email</th>
+
+            <th>Phone</th>
+
+            <th>Status</th>
+
+            <th>Created</th>
+
+            <th>Actions</th>
+
+          </tr>
+
+        </thead>
+
+        <tbody id="recordTable">
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<div id="message"></div>
 
 
 <script>
 
-
-/* ==========================================
-   GLOBAL DATA
-   ========================================== */
-
 let records = [];
 
-let editing = false;
+
+/**
+ * Load records when page opens
+ */
+window.onload = function() {
+  loadRecords();
+};
 
 
-/* ==========================================
-   PAGE LOAD
-   ========================================== */
-
-window.addEventListener(
-  "load",
-  function() {
-
-    loadRecords();
-
-  }
-);
-
-
-/* ==========================================
-   LOAD RECORDS
-   ========================================== */
-
+/**
+ * READ
+ */
 function loadRecords() {
 
   showLoading(true);
 
   google.script.run
 
-    .withSuccessHandler(
-      function(data) {
+    .withSuccessHandler(function(data) {
 
-        records =
-          Array.isArray(data)
-          ? data
-          : [];
+      records = data || [];
 
-        renderRecords(records);
+      renderRecords(records);
 
-        showLoading(false);
+      showLoading(false);
 
-      }
-    )
+    })
 
-    .withFailureHandler(
-      function(error) {
+    .withFailureHandler(function(error) {
 
-        showLoading(false);
+      showLoading(false);
 
-        showMessage(
-          error.message ||
-          "Unable to load records.",
-          "error"
-        );
+      showMessage(
+        error.message,
+        "error"
+      );
 
-      }
-    )
+    })
 
     .getRecords();
 
 }
 
 
-/* ==========================================
-   RENDER RECORDS
-   ========================================== */
-
+/**
+ * Display records
+ */
 function renderRecords(data) {
 
   const table =
-    document.getElementById(
-      "recordTable"
-    );
-
+    document.getElementById("recordTable");
 
   table.innerHTML = "";
 
 
-  if (!data || data.length === 0) {
+  if (data.length === 0) {
 
     table.innerHTML = `
-
       <tr>
-
-        <td
-          colspan="8"
-          class="empty"
-        >
-
+        <td colspan="7"
+            style="text-align:center;padding:30px;">
           No records found.
-
         </td>
-
       </tr>
-
     `;
 
     return;
-
   }
 
 
-  data.forEach(
-    function(record) {
+  data.forEach(function(record) {
+
+    const statusClass =
+      record.status === "Active"
+      ? "status-active"
+      : "status-inactive";
 
 
-      const row =
-        document.createElement("tr");
+    const row = document.createElement("tr");
 
 
-      const statusClass =
-        record.status === "Active"
-        ? "status-active"
-        : "status-inactive";
+    row.innerHTML = `
 
+      <td>${escapeHtml(record.id)}</td>
 
-      row.innerHTML = `
+      <td>${escapeHtml(record.name)}</td>
 
-        <td>
-          ${escapeHtml(record.id)}
-        </td>
+      <td>${escapeHtml(record.email)}</td>
 
-        <td>
-          ${escapeHtml(record.name)}
-        </td>
+      <td>${escapeHtml(record.phone)}</td>
 
-        <td>
-          ${escapeHtml(record.email)}
-        </td>
+      <td>
+        <span class="status ${statusClass}">
+          ${escapeHtml(record.status)}
+        </span>
+      </td>
 
-        <td>
-          ${escapeHtml(record.phone)}
-        </td>
+      <td>
+        ${escapeHtml(record.createdAt)}
+      </td>
 
-        <td>
+      <td>
 
-          <span
-            class="status ${statusClass}"
+        <div class="action-buttons">
+
+          <button
+            class="btn-edit"
+            onclick="editRecord('${escapeJs(record.id)}')"
           >
+            Edit
+          </button>
 
-            ${escapeHtml(record.status)}
+          <button
+            class="btn-delete"
+            onclick="deleteRecord('${escapeJs(record.id)}')"
+          >
+            Delete
+          </button>
 
-          </span>
+        </div>
 
-        </td>
+      </td>
 
-        <td>
-          ${escapeHtml(record.createdAt)}
-        </td>
-
-        <td>
-          ${escapeHtml(record.updatedAt)}
-        </td>
-
-        <td>
-
-          <div class="action-buttons">
-
-            <button
-              class="btn-edit"
-              onclick="editRecord('${escapeJs(record.id)}')"
-            >
-              Edit
-            </button>
+    `;
 
 
-            <button
-              class="btn-delete"
-              onclick="deleteRecord('${escapeJs(record.id)}')"
-            >
-              Delete
-            </button>
+    table.appendChild(row);
 
-          </div>
-
-        </td>
-
-      `;
-
-
-      table.appendChild(row);
-
-    }
-  );
+  });
 
 }
 
 
-/* ==========================================
-   CREATE / UPDATE FORM
-   ========================================== */
-
+/**
+ * CREATE / UPDATE
+ */
 document
   .getElementById("recordForm")
-  .addEventListener(
-    "submit",
-    function(event) {
+  .addEventListener("submit", function(event) {
 
-      event.preventDefault();
+    event.preventDefault();
 
 
-      const id =
-        document
-          .getElementById("recordId")
-          .value;
+    const id =
+      document.getElementById("recordId").value;
 
 
-      const data = {
+    const data = {
 
-        id: id,
+      id: id,
 
-        name:
-          document
-            .getElementById("name")
-            .value
-            .trim(),
+      name:
+        document.getElementById("name").value.trim(),
 
-        email:
-          document
-            .getElementById("email")
-            .value
-            .trim(),
+      email:
+        document.getElementById("email").value.trim(),
 
-        phone:
-          document
-            .getElementById("phone")
-            .value
-            .trim(),
+      phone:
+        document.getElementById("phone").value.trim(),
 
-        status:
-          document
-            .getElementById("status")
-            .value
+      status:
+        document.getElementById("status").value
 
-      };
+    };
 
 
-      if (!data.name) {
+    if (!data.name || !data.email) {
 
-        showMessage(
-          "Please enter a name.",
-          "error"
-        );
+      showMessage(
+        "Name and email are required.",
+        "error"
+      );
 
-        return;
-
-      }
-
-
-      if (!data.email) {
-
-        showMessage(
-          "Please enter an email.",
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      const submitButton =
-        document.getElementById(
-          "submitButton"
-        );
-
-
-      submitButton.disabled =
-        true;
-
-
-      if (id) {
-
-        updateRecord(data);
-
-      } else {
-
-        createRecord(data);
-
-      }
+      return;
 
     }
-  );
 
 
-/* ==========================================
-   CREATE
-   ========================================== */
+    document.getElementById("submitButton").disabled =
+      true;
 
-function createRecord(data) {
 
-  google.script.run
+    if (id) {
 
-    .withSuccessHandler(
-      function(response) {
+      // UPDATE
 
-        showMessage(
-          response.message,
-          "success"
-        );
+      google.script.run
 
-        resetForm();
+        .withSuccessHandler(function(response) {
 
-        loadRecords();
+          showMessage(
+            response.message,
+            "success"
+          );
 
-      }
-    )
+          resetForm();
+          loadRecords();
 
-    .withFailureHandler(
-      function(error) {
+        })
 
-        document
-          .getElementById(
+        .withFailureHandler(function(error) {
+
+          showMessage(
+            error.message,
+            "error"
+          );
+
+          document.getElementById(
             "submitButton"
-          )
-          .disabled = false;
+          ).disabled = false;
 
-        showMessage(
-          error.message ||
-          "Unable to create record.",
-          "error"
-        );
+        })
 
-      }
-    )
-
-    .createRecord(data);
-
-}
+        .updateRecord(data);
 
 
-/* ==========================================
-   UPDATE
-   ========================================== */
+    } else {
 
-function updateRecord(data) {
+      // CREATE
 
-  google.script.run
+      google.script.run
 
-    .withSuccessHandler(
-      function(response) {
+        .withSuccessHandler(function(response) {
 
-        showMessage(
-          response.message,
-          "success"
-        );
+          showMessage(
+            response.message,
+            "success"
+          );
 
-        resetForm();
+          resetForm();
+          loadRecords();
 
-        loadRecords();
+        })
 
-      }
-    )
+        .withFailureHandler(function(error) {
 
-    .withFailureHandler(
-      function(error) {
+          showMessage(
+            error.message,
+            "error"
+          );
 
-        document
-          .getElementById(
+          document.getElementById(
             "submitButton"
-          )
-          .disabled = false;
+          ).disabled = false;
 
-        showMessage(
-          error.message ||
-          "Unable to update record.",
-          "error"
-        );
+        })
 
-      }
-    )
+        .createRecord(data);
 
-    .updateRecord(data);
+    }
 
-}
+  });
 
 
-/* ==========================================
-   EDIT
-   ========================================== */
-
+/**
+ * EDIT
+ */
 function editRecord(id) {
 
   const record =
-    records.find(
-      function(item) {
+    records.find(function(item) {
 
-        return String(item.id) ===
-          String(id);
+      return String(item.id) === String(id);
 
-      }
-    );
+    });
 
 
   if (!record) {
@@ -1485,42 +751,23 @@ function editRecord(id) {
   }
 
 
-  editing = true;
-
-
-  document
-    .getElementById("recordId")
-    .value =
+  document.getElementById("recordId").value =
     record.id;
 
-
-  document
-    .getElementById("name")
-    .value =
+  document.getElementById("name").value =
     record.name;
 
-
-  document
-    .getElementById("email")
-    .value =
+  document.getElementById("email").value =
     record.email;
 
-
-  document
-    .getElementById("phone")
-    .value =
+  document.getElementById("phone").value =
     record.phone;
 
-
-  document
-    .getElementById("status")
-    .value =
+  document.getElementById("status").value =
     record.status;
 
 
-  document
-    .getElementById("submitButton")
-    .textContent =
+  document.getElementById("submitButton").textContent =
     "Update Record";
 
 
@@ -1532,14 +779,13 @@ function editRecord(id) {
 }
 
 
-/* ==========================================
-   DELETE
-   ========================================== */
-
+/**
+ * DELETE
+ */
 function deleteRecord(id) {
 
   const confirmed =
-    window.confirm(
+    confirm(
       "Are you sure you want to delete this record?"
     );
 
@@ -1554,42 +800,36 @@ function deleteRecord(id) {
 
   google.script.run
 
-    .withSuccessHandler(
-      function(response) {
+    .withSuccessHandler(function(response) {
 
-        showMessage(
-          response.message,
-          "success"
-        );
+      showMessage(
+        response.message,
+        "success"
+      );
 
-        loadRecords();
+      loadRecords();
 
-      }
-    )
+    })
 
-    .withFailureHandler(
-      function(error) {
+    .withFailureHandler(function(error) {
 
-        showLoading(false);
+      showLoading(false);
 
-        showMessage(
-          error.message ||
-          "Unable to delete record.",
-          "error"
-        );
+      showMessage(
+        error.message,
+        "error"
+      );
 
-      }
-    )
+    })
 
     .deleteRecord(id);
 
 }
 
 
-/* ==========================================
-   RESET FORM
-   ========================================== */
-
+/**
+ * Reset form
+ */
 function resetForm() {
 
   document
@@ -1597,95 +837,72 @@ function resetForm() {
     .reset();
 
 
-  document
-    .getElementById("recordId")
-    .value = "";
+  document.getElementById("recordId").value =
+    "";
 
 
-  document
-    .getElementById("status")
-    .value =
+  document.getElementById("status").value =
     "Active";
 
 
-  document
-    .getElementById("submitButton")
-    .textContent =
+  document.getElementById("submitButton").textContent =
     "Add Record";
 
 
-  document
-    .getElementById("submitButton")
-    .disabled =
+  document.getElementById("submitButton").disabled =
     false;
-
-
-  editing = false;
 
 }
 
 
-/* ==========================================
-   SEARCH
-   ========================================== */
-
+/**
+ * Search
+ */
 function searchRecords() {
 
   const search =
     document
       .getElementById("searchInput")
       .value
-      .toLowerCase()
-      .trim();
-
-
-  if (!search) {
-
-    renderRecords(records);
-
-    return;
-
-  }
+      .toLowerCase();
 
 
   const filtered =
-    records.filter(
-      function(record) {
+    records.filter(function(record) {
 
-        return (
+      return (
 
-          String(record.id)
-            .toLowerCase()
-            .includes(search)
+        String(record.id)
+          .toLowerCase()
+          .includes(search)
 
-          ||
+        ||
 
-          String(record.name)
-            .toLowerCase()
-            .includes(search)
+        String(record.name)
+          .toLowerCase()
+          .includes(search)
 
-          ||
+        ||
 
-          String(record.email)
-            .toLowerCase()
-            .includes(search)
+        String(record.email)
+          .toLowerCase()
+          .includes(search)
 
-          ||
+        ||
 
-          String(record.phone)
-            .toLowerCase()
-            .includes(search)
+        String(record.phone)
+          .toLowerCase()
+          .includes(search)
 
-          ||
+        ||
 
-          String(record.status)
-            .toLowerCase()
-            .includes(search)
+        String(record.status)
+          .toLowerCase()
+          .includes(search)
 
-        );
+      );
 
-      }
-    );
+    });
 
 
   renderRecords(filtered);
@@ -1693,139 +910,74 @@ function searchRecords() {
 }
 
 
-/* ==========================================
-   LOADING
-   ========================================== */
-
+/**
+ * Loading indicator
+ */
 function showLoading(show) {
 
-  const element =
-    document.getElementById(
-      "loading"
-    );
-
-
-  element.style.display =
-    show
-    ? "block"
-    : "none";
+  document.getElementById("loading").style.display =
+    show ? "block" : "none";
 
 }
 
 
-/* ==========================================
-   NOTIFICATION
-   ========================================== */
-
-function showMessage(
-  message,
-  type
-) {
+/**
+ * Success/error notification
+ */
+function showMessage(message, type) {
 
   const element =
-    document.getElementById(
-      "message"
-    );
+    document.getElementById("message");
 
 
-  element.textContent =
-    message;
+  element.textContent = message;
+
+  element.className = type;
+
+  element.style.display = "block";
 
 
-  element.className =
-    type;
+  setTimeout(function() {
 
+    element.style.display = "none";
 
-  element.style.display =
-    "block";
-
-
-  setTimeout(
-    function() {
-
-      element.style.display =
-        "none";
-
-    },
-    3500
-  );
+  }, 3000);
 
 }
 
 
-/* ==========================================
-   HTML SECURITY
-   ========================================== */
-
+/**
+ * Protect HTML output
+ */
 function escapeHtml(value) {
 
-  if (
-    value === null ||
-    value === undefined
-  ) {
-
+  if (value === null || value === undefined) {
     return "";
-
   }
 
-
   return String(value)
-
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-
-    .replace(
-      /</g,
-      "&lt;"
-    )
-
-    .replace(
-      />/g,
-      "&gt;"
-    )
-
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-
-    .replace(
-      /'/g,
-      "&#039;"
-    );
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 
 }
 
 
-/* ==========================================
-   JAVASCRIPT STRING SECURITY
-   ========================================== */
-
+/**
+ * Protect values inserted into JS attributes
+ */
 function escapeJs(value) {
 
   return String(value)
-
-    .replace(
-      /\\/g,
-      "\\\\"
-    )
-
-    .replace(
-      /'/g,
-      "\\'"
-    )
-
-    .replace(
-      /"/g,
-      '\\"'
-    );
+    .replace(/\\/g, "\\\\")
+    .replace(/'/g, "\\'")
+    .replace(/"/g, '\\"');
 
 }
 
 </script>
-
 
 </body>
 
