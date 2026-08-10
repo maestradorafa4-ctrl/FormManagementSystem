@@ -1,0 +1,1832 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+  <base target="_top">
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>CRUD Management System</title>
+
+
+  <style>
+
+    /* =========================================
+       RESET
+       ========================================= */
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+
+    /* =========================================
+       BODY
+       ========================================= */
+
+    body {
+
+      font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+      background:
+        #f1f5f9;
+
+      color:
+        #1e293b;
+
+      min-height:
+        100vh;
+
+    }
+
+
+    /* =========================================
+       CONTAINER
+       ========================================= */
+
+    .container {
+
+      width:
+        95%;
+
+      max-width:
+        1250px;
+
+      margin:
+        30px auto;
+
+    }
+
+
+    /* =========================================
+       HEADER
+       ========================================= */
+
+    .header {
+
+      background:
+        linear-gradient(
+          135deg,
+          #2563eb,
+          #1e40af
+        );
+
+      color:
+        white;
+
+      padding:
+        30px;
+
+      border-radius:
+        14px 14px 0 0;
+
+      box-shadow:
+        0 5px 20px
+        rgba(0,0,0,0.08);
+
+    }
+
+
+    .header h1 {
+
+      font-size:
+        28px;
+
+      margin-bottom:
+        7px;
+
+    }
+
+
+    .header p {
+
+      opacity:
+        0.9;
+
+      font-size:
+        14px;
+
+    }
+
+
+    /* =========================================
+       CARD
+       ========================================= */
+
+    .card {
+
+      background:
+        white;
+
+      padding:
+        25px;
+
+      box-shadow:
+        0 5px 20px
+        rgba(0,0,0,0.06);
+
+    }
+
+
+    /* =========================================
+       FORM
+       ========================================= */
+
+    .form-grid {
+
+      display:
+        grid;
+
+      grid-template-columns:
+        repeat(2, 1fr);
+
+      gap:
+        18px;
+
+    }
+
+
+    .form-group {
+
+      display:
+        flex;
+
+      flex-direction:
+        column;
+
+    }
+
+
+    .form-group.full {
+
+      grid-column:
+        1 / -1;
+
+    }
+
+
+    label {
+
+      font-size:
+        14px;
+
+      font-weight:
+        bold;
+
+      margin-bottom:
+        7px;
+
+      color:
+        #334155;
+
+    }
+
+
+    input,
+    select {
+
+      width:
+        100%;
+
+      padding:
+        12px 14px;
+
+      border:
+        1px solid #cbd5e1;
+
+      border-radius:
+        8px;
+
+      font-size:
+        14px;
+
+      outline:
+        none;
+
+      transition:
+        0.2s;
+
+    }
+
+
+    input:focus,
+    select:focus {
+
+      border-color:
+        #2563eb;
+
+      box-shadow:
+        0 0 0 3px
+        rgba(37,99,235,0.1);
+
+    }
+
+
+    /* =========================================
+       BUTTONS
+       ========================================= */
+
+    .buttons {
+
+      display:
+        flex;
+
+      gap:
+        10px;
+
+      margin-top:
+        20px;
+
+    }
+
+
+    button {
+
+      border:
+        none;
+
+      border-radius:
+        7px;
+
+      padding:
+        11px 18px;
+
+      cursor:
+        pointer;
+
+      font-size:
+        14px;
+
+      font-weight:
+        bold;
+
+      transition:
+        0.2s;
+
+    }
+
+
+    button:hover {
+
+      transform:
+        translateY(-1px);
+
+    }
+
+
+    button:disabled {
+
+      opacity:
+        0.6;
+
+      cursor:
+        not-allowed;
+
+      transform:
+        none;
+
+    }
+
+
+    .btn-primary {
+
+      background:
+        #2563eb;
+
+      color:
+        white;
+
+    }
+
+
+    .btn-primary:hover {
+
+      background:
+        #1d4ed8;
+
+    }
+
+
+    .btn-secondary {
+
+      background:
+        #64748b;
+
+      color:
+        white;
+
+    }
+
+
+    .btn-secondary:hover {
+
+      background:
+        #475569;
+
+    }
+
+
+    .btn-edit {
+
+      background:
+        #f59e0b;
+
+      color:
+        white;
+
+    }
+
+
+    .btn-edit:hover {
+
+      background:
+        #d97706;
+
+    }
+
+
+    .btn-delete {
+
+      background:
+        #dc2626;
+
+      color:
+        white;
+
+    }
+
+
+    .btn-delete:hover {
+
+      background:
+        #b91c1c;
+
+    }
+
+
+    /* =========================================
+       RECORD SECTION
+       ========================================= */
+
+    .records-card {
+
+      margin-top:
+        25px;
+
+      border-radius:
+        0 0 14px 14px;
+
+    }
+
+
+    .table-header {
+
+      display:
+        flex;
+
+      justify-content:
+        space-between;
+
+      align-items:
+        center;
+
+      gap:
+        20px;
+
+      margin-bottom:
+        20px;
+
+    }
+
+
+    .table-header h2 {
+
+      font-size:
+        21px;
+
+    }
+
+
+    .search-box {
+
+      width:
+        320px;
+
+      max-width:
+        100%;
+
+    }
+
+
+    /* =========================================
+       TABLE
+       ========================================= */
+
+    .table-wrapper {
+
+      overflow-x:
+        auto;
+
+    }
+
+
+    table {
+
+      width:
+        100%;
+
+      border-collapse:
+        collapse;
+
+      min-width:
+        900px;
+
+    }
+
+
+    th {
+
+      background:
+        #0f172a;
+
+      color:
+        white;
+
+      text-align:
+        left;
+
+      padding:
+        13px;
+
+      font-size:
+        13px;
+
+      white-space:
+        nowrap;
+
+    }
+
+
+    td {
+
+      padding:
+        12px;
+
+      border-bottom:
+        1px solid #e2e8f0;
+
+      font-size:
+        13px;
+
+      vertical-align:
+        middle;
+
+    }
+
+
+    tbody tr:hover {
+
+      background:
+        #f8fafc;
+
+    }
+
+
+    /* =========================================
+       STATUS
+       ========================================= */
+
+    .status {
+
+      display:
+        inline-block;
+
+      padding:
+        5px 10px;
+
+      border-radius:
+        20px;
+
+      font-size:
+        11px;
+
+      font-weight:
+        bold;
+
+    }
+
+
+    .status-active {
+
+      background:
+        #dcfce7;
+
+      color:
+        #166534;
+
+    }
+
+
+    .status-inactive {
+
+      background:
+        #fee2e2;
+
+      color:
+        #991b1b;
+
+    }
+
+
+    /* =========================================
+       ACTIONS
+       ========================================= */
+
+    .action-buttons {
+
+      display:
+        flex;
+
+      gap:
+        5px;
+
+    }
+
+
+    .action-buttons button {
+
+      padding:
+        7px 10px;
+
+      font-size:
+        12px;
+
+    }
+
+
+    /* =========================================
+       LOADING
+       ========================================= */
+
+    .loading {
+
+      display:
+        none;
+
+      text-align:
+        center;
+
+      padding:
+        20px;
+
+      color:
+        #2563eb;
+
+      font-weight:
+        bold;
+
+    }
+
+
+    .spinner {
+
+      display:
+        inline-block;
+
+      width:
+        18px;
+
+      height:
+        18px;
+
+      border:
+        3px solid #dbeafe;
+
+      border-top:
+        3px solid #2563eb;
+
+      border-radius:
+        50%;
+
+      animation:
+        spin 1s linear infinite;
+
+      vertical-align:
+        middle;
+
+      margin-right:
+        8px;
+
+    }
+
+
+    @keyframes spin {
+
+      0% {
+        transform:
+          rotate(0deg);
+      }
+
+      100% {
+        transform:
+          rotate(360deg);
+      }
+
+    }
+
+
+    /* =========================================
+       EMPTY STATE
+       ========================================= */
+
+    .empty {
+
+      text-align:
+        center;
+
+      padding:
+        40px;
+
+      color:
+        #64748b;
+
+    }
+
+
+    /* =========================================
+       NOTIFICATION
+       ========================================= */
+
+    #message {
+
+      position:
+        fixed;
+
+      top:
+        20px;
+
+      right:
+        20px;
+
+      max-width:
+        350px;
+
+      padding:
+        14px 18px;
+
+      border-radius:
+        8px;
+
+      color:
+        white;
+
+      display:
+        none;
+
+      z-index:
+        9999;
+
+      box-shadow:
+        0 8px 25px
+        rgba(0,0,0,0.2);
+
+      font-size:
+        14px;
+
+    }
+
+
+    #message.success {
+
+      background:
+        #16a34a;
+
+    }
+
+
+    #message.error {
+
+      background:
+        #dc2626;
+
+    }
+
+
+    /* =========================================
+       MOBILE
+       ========================================= */
+
+    @media(max-width: 700px) {
+
+      .container {
+
+        width:
+          100%;
+
+        margin:
+          0;
+
+      }
+
+
+      .header {
+
+        border-radius:
+          0;
+
+      }
+
+
+      .card {
+
+        padding:
+          18px;
+
+      }
+
+
+      .form-grid {
+
+        grid-template-columns:
+          1fr;
+
+      }
+
+
+      .form-group.full {
+
+        grid-column:
+          auto;
+
+      }
+
+
+      .table-header {
+
+        flex-direction:
+          column;
+
+        align-items:
+          stretch;
+
+      }
+
+
+      .search-box {
+
+        width:
+          100%;
+
+      }
+
+
+      .buttons {
+
+        flex-direction:
+          column;
+
+      }
+
+
+      .buttons button {
+
+        width:
+          100%;
+
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+  <div class="container">
+
+
+    <!-- =====================================
+         HEADER
+         ====================================== -->
+
+    <div class="header">
+
+      <h1>
+        CRUD Management System
+      </h1>
+
+      <p>
+        Manage records using Google Sheets
+        and Google Apps Script
+      </p>
+
+    </div>
+
+
+    <!-- =====================================
+         FORM
+         ====================================== -->
+
+    <div class="card">
+
+      <form id="recordForm">
+
+        <!-- Hidden ID -->
+
+        <input
+          type="hidden"
+          id="recordId"
+        >
+
+
+        <div class="form-grid">
+
+
+          <!-- NAME -->
+
+          <div class="form-group">
+
+            <label for="name">
+              Name *
+            </label>
+
+            <input
+              type="text"
+              id="name"
+              placeholder="Enter full name"
+              required
+            >
+
+          </div>
+
+
+          <!-- EMAIL -->
+
+          <div class="form-group">
+
+            <label for="email">
+              Email *
+            </label>
+
+            <input
+              type="email"
+              id="email"
+              placeholder="Enter email address"
+              required
+            >
+
+          </div>
+
+
+          <!-- PHONE -->
+
+          <div class="form-group">
+
+            <label for="phone">
+              Phone
+            </label>
+
+            <input
+              type="text"
+              id="phone"
+              placeholder="Enter phone number"
+            >
+
+          </div>
+
+
+          <!-- STATUS -->
+
+          <div class="form-group">
+
+            <label for="status">
+              Status
+            </label>
+
+            <select id="status">
+
+              <option value="Active">
+                Active
+              </option>
+
+              <option value="Inactive">
+                Inactive
+              </option>
+
+            </select>
+
+          </div>
+
+
+        </div>
+
+
+        <!-- FORM BUTTONS -->
+
+        <div class="buttons">
+
+          <button
+            type="submit"
+            class="btn-primary"
+            id="submitButton"
+          >
+            Add Record
+          </button>
+
+
+          <button
+            type="button"
+            class="btn-secondary"
+            onclick="resetForm()"
+          >
+            Clear
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+
+    <!-- =====================================
+         RECORDS
+         ====================================== -->
+
+    <div class="card records-card">
+
+
+      <div class="table-header">
+
+        <h2>
+          Records
+        </h2>
+
+
+        <input
+          type="text"
+          id="searchInput"
+          class="search-box"
+          placeholder="Search records..."
+          oninput="searchRecords()"
+        >
+
+      </div>
+
+
+      <!-- LOADING -->
+
+      <div
+        id="loading"
+        class="loading"
+      >
+
+        <span class="spinner"></span>
+
+        Loading records...
+
+      </div>
+
+
+      <!-- TABLE -->
+
+      <div class="table-wrapper">
+
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th>
+                ID
+              </th>
+
+              <th>
+                Name
+              </th>
+
+              <th>
+                Email
+              </th>
+
+              <th>
+                Phone
+              </th>
+
+              <th>
+                Status
+              </th>
+
+              <th>
+                Created
+              </th>
+
+              <th>
+                Updated
+              </th>
+
+              <th>
+                Actions
+              </th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody id="recordTable">
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+  <!-- =======================================
+       NOTIFICATION
+       ======================================== -->
+
+  <div id="message"></div>
+
+
+<script>
+
+
+/* ==========================================
+   GLOBAL DATA
+   ========================================== */
+
+let records = [];
+
+let editing = false;
+
+
+/* ==========================================
+   PAGE LOAD
+   ========================================== */
+
+window.addEventListener(
+  "load",
+  function() {
+
+    loadRecords();
+
+  }
+);
+
+
+/* ==========================================
+   LOAD RECORDS
+   ========================================== */
+
+function loadRecords() {
+
+  showLoading(true);
+
+  google.script.run
+
+    .withSuccessHandler(
+      function(data) {
+
+        records =
+          Array.isArray(data)
+          ? data
+          : [];
+
+        renderRecords(records);
+
+        showLoading(false);
+
+      }
+    )
+
+    .withFailureHandler(
+      function(error) {
+
+        showLoading(false);
+
+        showMessage(
+          error.message ||
+          "Unable to load records.",
+          "error"
+        );
+
+      }
+    )
+
+    .getRecords();
+
+}
+
+
+/* ==========================================
+   RENDER RECORDS
+   ========================================== */
+
+function renderRecords(data) {
+
+  const table =
+    document.getElementById(
+      "recordTable"
+    );
+
+
+  table.innerHTML = "";
+
+
+  if (!data || data.length === 0) {
+
+    table.innerHTML = `
+
+      <tr>
+
+        <td
+          colspan="8"
+          class="empty"
+        >
+
+          No records found.
+
+        </td>
+
+      </tr>
+
+    `;
+
+    return;
+
+  }
+
+
+  data.forEach(
+    function(record) {
+
+
+      const row =
+        document.createElement("tr");
+
+
+      const statusClass =
+        record.status === "Active"
+        ? "status-active"
+        : "status-inactive";
+
+
+      row.innerHTML = `
+
+        <td>
+          ${escapeHtml(record.id)}
+        </td>
+
+        <td>
+          ${escapeHtml(record.name)}
+        </td>
+
+        <td>
+          ${escapeHtml(record.email)}
+        </td>
+
+        <td>
+          ${escapeHtml(record.phone)}
+        </td>
+
+        <td>
+
+          <span
+            class="status ${statusClass}"
+          >
+
+            ${escapeHtml(record.status)}
+
+          </span>
+
+        </td>
+
+        <td>
+          ${escapeHtml(record.createdAt)}
+        </td>
+
+        <td>
+          ${escapeHtml(record.updatedAt)}
+        </td>
+
+        <td>
+
+          <div class="action-buttons">
+
+            <button
+              class="btn-edit"
+              onclick="editRecord('${escapeJs(record.id)}')"
+            >
+              Edit
+            </button>
+
+
+            <button
+              class="btn-delete"
+              onclick="deleteRecord('${escapeJs(record.id)}')"
+            >
+              Delete
+            </button>
+
+          </div>
+
+        </td>
+
+      `;
+
+
+      table.appendChild(row);
+
+    }
+  );
+
+}
+
+
+/* ==========================================
+   CREATE / UPDATE FORM
+   ========================================== */
+
+document
+  .getElementById("recordForm")
+  .addEventListener(
+    "submit",
+    function(event) {
+
+      event.preventDefault();
+
+
+      const id =
+        document
+          .getElementById("recordId")
+          .value;
+
+
+      const data = {
+
+        id: id,
+
+        name:
+          document
+            .getElementById("name")
+            .value
+            .trim(),
+
+        email:
+          document
+            .getElementById("email")
+            .value
+            .trim(),
+
+        phone:
+          document
+            .getElementById("phone")
+            .value
+            .trim(),
+
+        status:
+          document
+            .getElementById("status")
+            .value
+
+      };
+
+
+      if (!data.name) {
+
+        showMessage(
+          "Please enter a name.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      if (!data.email) {
+
+        showMessage(
+          "Please enter an email.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      const submitButton =
+        document.getElementById(
+          "submitButton"
+        );
+
+
+      submitButton.disabled =
+        true;
+
+
+      if (id) {
+
+        updateRecord(data);
+
+      } else {
+
+        createRecord(data);
+
+      }
+
+    }
+  );
+
+
+/* ==========================================
+   CREATE
+   ========================================== */
+
+function createRecord(data) {
+
+  google.script.run
+
+    .withSuccessHandler(
+      function(response) {
+
+        showMessage(
+          response.message,
+          "success"
+        );
+
+        resetForm();
+
+        loadRecords();
+
+      }
+    )
+
+    .withFailureHandler(
+      function(error) {
+
+        document
+          .getElementById(
+            "submitButton"
+          )
+          .disabled = false;
+
+        showMessage(
+          error.message ||
+          "Unable to create record.",
+          "error"
+        );
+
+      }
+    )
+
+    .createRecord(data);
+
+}
+
+
+/* ==========================================
+   UPDATE
+   ========================================== */
+
+function updateRecord(data) {
+
+  google.script.run
+
+    .withSuccessHandler(
+      function(response) {
+
+        showMessage(
+          response.message,
+          "success"
+        );
+
+        resetForm();
+
+        loadRecords();
+
+      }
+    )
+
+    .withFailureHandler(
+      function(error) {
+
+        document
+          .getElementById(
+            "submitButton"
+          )
+          .disabled = false;
+
+        showMessage(
+          error.message ||
+          "Unable to update record.",
+          "error"
+        );
+
+      }
+    )
+
+    .updateRecord(data);
+
+}
+
+
+/* ==========================================
+   EDIT
+   ========================================== */
+
+function editRecord(id) {
+
+  const record =
+    records.find(
+      function(item) {
+
+        return String(item.id) ===
+          String(id);
+
+      }
+    );
+
+
+  if (!record) {
+
+    showMessage(
+      "Record not found.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  editing = true;
+
+
+  document
+    .getElementById("recordId")
+    .value =
+    record.id;
+
+
+  document
+    .getElementById("name")
+    .value =
+    record.name;
+
+
+  document
+    .getElementById("email")
+    .value =
+    record.email;
+
+
+  document
+    .getElementById("phone")
+    .value =
+    record.phone;
+
+
+  document
+    .getElementById("status")
+    .value =
+    record.status;
+
+
+  document
+    .getElementById("submitButton")
+    .textContent =
+    "Update Record";
+
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+}
+
+
+/* ==========================================
+   DELETE
+   ========================================== */
+
+function deleteRecord(id) {
+
+  const confirmed =
+    window.confirm(
+      "Are you sure you want to delete this record?"
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  showLoading(true);
+
+
+  google.script.run
+
+    .withSuccessHandler(
+      function(response) {
+
+        showMessage(
+          response.message,
+          "success"
+        );
+
+        loadRecords();
+
+      }
+    )
+
+    .withFailureHandler(
+      function(error) {
+
+        showLoading(false);
+
+        showMessage(
+          error.message ||
+          "Unable to delete record.",
+          "error"
+        );
+
+      }
+    )
+
+    .deleteRecord(id);
+
+}
+
+
+/* ==========================================
+   RESET FORM
+   ========================================== */
+
+function resetForm() {
+
+  document
+    .getElementById("recordForm")
+    .reset();
+
+
+  document
+    .getElementById("recordId")
+    .value = "";
+
+
+  document
+    .getElementById("status")
+    .value =
+    "Active";
+
+
+  document
+    .getElementById("submitButton")
+    .textContent =
+    "Add Record";
+
+
+  document
+    .getElementById("submitButton")
+    .disabled =
+    false;
+
+
+  editing = false;
+
+}
+
+
+/* ==========================================
+   SEARCH
+   ========================================== */
+
+function searchRecords() {
+
+  const search =
+    document
+      .getElementById("searchInput")
+      .value
+      .toLowerCase()
+      .trim();
+
+
+  if (!search) {
+
+    renderRecords(records);
+
+    return;
+
+  }
+
+
+  const filtered =
+    records.filter(
+      function(record) {
+
+        return (
+
+          String(record.id)
+            .toLowerCase()
+            .includes(search)
+
+          ||
+
+          String(record.name)
+            .toLowerCase()
+            .includes(search)
+
+          ||
+
+          String(record.email)
+            .toLowerCase()
+            .includes(search)
+
+          ||
+
+          String(record.phone)
+            .toLowerCase()
+            .includes(search)
+
+          ||
+
+          String(record.status)
+            .toLowerCase()
+            .includes(search)
+
+        );
+
+      }
+    );
+
+
+  renderRecords(filtered);
+
+}
+
+
+/* ==========================================
+   LOADING
+   ========================================== */
+
+function showLoading(show) {
+
+  const element =
+    document.getElementById(
+      "loading"
+    );
+
+
+  element.style.display =
+    show
+    ? "block"
+    : "none";
+
+}
+
+
+/* ==========================================
+   NOTIFICATION
+   ========================================== */
+
+function showMessage(
+  message,
+  type
+) {
+
+  const element =
+    document.getElementById(
+      "message"
+    );
+
+
+  element.textContent =
+    message;
+
+
+  element.className =
+    type;
+
+
+  element.style.display =
+    "block";
+
+
+  setTimeout(
+    function() {
+
+      element.style.display =
+        "none";
+
+    },
+    3500
+  );
+
+}
+
+
+/* ==========================================
+   HTML SECURITY
+   ========================================== */
+
+function escapeHtml(value) {
+
+  if (
+    value === null ||
+    value === undefined
+  ) {
+
+    return "";
+
+  }
+
+
+  return String(value)
+
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    )
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+/* ==========================================
+   JAVASCRIPT STRING SECURITY
+   ========================================== */
+
+function escapeJs(value) {
+
+  return String(value)
+
+    .replace(
+      /\\/g,
+      "\\\\"
+    )
+
+    .replace(
+      /'/g,
+      "\\'"
+    )
+
+    .replace(
+      /"/g,
+      '\\"'
+    );
+
+}
+
+</script>
+
+
+</body>
+
+</html>
