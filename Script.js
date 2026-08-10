@@ -1,32 +1,27 @@
-const SHEET_NAME = "Data";
+const SPREADSHEET_ID = "17QhNk6Ap-LLYqpiP596p4nFelV385iVpUGh9zvsoLPs";
+const SHEET_NAME = "Form Management System";
 
-/**
- * ==========================================
- * WEB APP
- * ==========================================
- */
+
 function doGet() {
   return HtmlService
     .createHtmlOutputFromFile("Index")
-    .setTitle("CRUD Management System")
+    .setTitle("Form Management System")
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
 
-/**
- * ==========================================
- * GET / CREATE SHEET
- * ==========================================
- */
-function getSheet() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
 
-  let sheet = ss.getSheetByName(SHEET_NAME);
+function getSheet() {
+  const ss = SpreadsheetApp.openById(
+    "17QhNk6Ap-LLYqpiP596p4nFelV385iVpUGh9zvsoLPs"
+  );
+
+  let sheet = ss.getSheetByName("Form Management System");
 
   if (!sheet) {
-    sheet = ss.insertSheet(SHEET_NAME);
+    sheet = ss.insertSheet("Form Management System");
 
-    sheet.getRange(1, 1, 1, 7).setValues([[
+    sheet.getRange("A1:G1").setValues([[
       "ID",
       "Name",
       "Email",
@@ -38,33 +33,21 @@ function getSheet() {
 
     sheet.getRange("A1:G1")
       .setFontWeight("bold")
-      .setBackground("#1d4ed8")
+      .setBackground("#2563eb")
       .setFontColor("#ffffff");
 
     sheet.setFrozenRows(1);
-
-    sheet.setColumnWidth(1, 220);
-    sheet.setColumnWidth(2, 180);
-    sheet.setColumnWidth(3, 220);
-    sheet.setColumnWidth(4, 150);
-    sheet.setColumnWidth(5, 120);
-    sheet.setColumnWidth(6, 180);
-    sheet.setColumnWidth(7, 180);
   }
 
   return sheet;
 }
 
-
 /**
- * ==========================================
  * READ
- * ==========================================
+ * Get all records
  */
 function getRecords() {
-
   const sheet = getSheet();
-
   const lastRow = sheet.getLastRow();
 
   if (lastRow <= 1) {
@@ -76,7 +59,6 @@ function getRecords() {
     .getValues();
 
   return data.map(function(row) {
-
     return {
       id: row[0],
       name: row[1],
@@ -86,15 +68,13 @@ function getRecords() {
       createdAt: formatDate(row[5]),
       updatedAt: formatDate(row[6])
     };
-
   });
 }
 
 
 /**
- * ==========================================
  * CREATE
- * ==========================================
+ * Add a new record
  */
 function createRecord(data) {
 
@@ -102,25 +82,24 @@ function createRecord(data) {
     throw new Error("No data received.");
   }
 
-  if (!data.name || data.name.trim() === "") {
+  if (!data.name) {
     throw new Error("Name is required.");
   }
 
-  if (!data.email || data.email.trim() === "") {
+  if (!data.email) {
     throw new Error("Email is required.");
   }
 
   const sheet = getSheet();
 
-  const id = generateId();
-
+  const id = "REC-" + new Date().getTime();
   const now = new Date();
 
   sheet.appendRow([
     id,
-    data.name.trim(),
-    data.email.trim(),
-    data.phone ? data.phone.trim() : "",
+    data.name,
+    data.email,
+    data.phone || "",
     data.status || "Active",
     now,
     now
@@ -128,16 +107,14 @@ function createRecord(data) {
 
   return {
     success: true,
-    message: "Record created successfully.",
-    id: id
+    message: "Record successfully created."
   };
 }
 
 
 /**
- * ==========================================
  * UPDATE
- * ==========================================
+ * Update an existing record
  */
 function updateRecord(data) {
 
@@ -145,30 +122,20 @@ function updateRecord(data) {
     throw new Error("Record ID is required.");
   }
 
-  if (!data.name || data.name.trim() === "") {
-    throw new Error("Name is required.");
-  }
-
-  if (!data.email || data.email.trim() === "") {
-    throw new Error("Email is required.");
-  }
-
   const sheet = getSheet();
-
   const row = findRowById(data.id);
 
   if (row === -1) {
     throw new Error("Record not found.");
   }
 
-  const createdAt =
-    sheet.getRange(row, 6).getValue();
+  const createdAt = sheet.getRange(row, 6).getValue();
 
   sheet.getRange(row, 1, 1, 7).setValues([[
     data.id,
-    data.name.trim(),
-    data.email.trim(),
-    data.phone ? data.phone.trim() : "",
+    data.name || "",
+    data.email || "",
+    data.phone || "",
     data.status || "Active",
     createdAt,
     new Date()
@@ -176,15 +143,14 @@ function updateRecord(data) {
 
   return {
     success: true,
-    message: "Record updated successfully."
+    message: "Record successfully updated."
   };
 }
 
 
 /**
- * ==========================================
  * DELETE
- * ==========================================
+ * Delete a record
  */
 function deleteRecord(id) {
 
@@ -193,7 +159,6 @@ function deleteRecord(id) {
   }
 
   const sheet = getSheet();
-
   const row = findRowById(id);
 
   if (row === -1) {
@@ -204,20 +169,17 @@ function deleteRecord(id) {
 
   return {
     success: true,
-    message: "Record deleted successfully."
+    message: "Record successfully deleted."
   };
 }
 
 
 /**
- * ==========================================
- * FIND ROW BY ID
- * ==========================================
+ * Find spreadsheet row using ID
  */
 function findRowById(id) {
 
   const sheet = getSheet();
-
   const lastRow = sheet.getLastRow();
 
   if (lastRow <= 1) {
@@ -241,29 +203,7 @@ function findRowById(id) {
 
 
 /**
- * ==========================================
- * GENERATE UNIQUE ID
- * ==========================================
- */
-function generateId() {
-
-  const timestamp =
-    new Date().getTime();
-
-  const random =
-    Math.floor(Math.random() * 10000);
-
-  return "REC-" +
-    timestamp +
-    "-" +
-    random;
-}
-
-
-/**
- * ==========================================
- * FORMAT DATE
- * ==========================================
+ * Format date/time
  */
 function formatDate(value) {
 
@@ -271,10 +211,7 @@ function formatDate(value) {
     return "";
   }
 
-  if (
-    Object.prototype.toString.call(value)
-    === "[object Date]"
-  ) {
+  if (Object.prototype.toString.call(value) === "[object Date]") {
 
     return Utilities.formatDate(
       value,
@@ -286,3 +223,4 @@ function formatDate(value) {
 
   return String(value);
 }
+
