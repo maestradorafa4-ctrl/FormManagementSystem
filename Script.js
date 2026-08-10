@@ -1,226 +1,986 @@
-const SPREADSHEET_ID = "17QhNk6Ap-LLYqpiP596p4nFelV385iVpUGh9zvsoLPs";
-const SHEET_NAME = "Form Management System";
+```javascript
+// ==========================================
+// GOOGLE APPS SCRIPT API URL
+// ==========================================
+
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbyFI96gvBU8vg5xht20kgG4XfW-C0Tf7rOu9Xmj5u5PkjkAE09ZF8qeqHus-ktMySYq/exec";
 
 
-function doGet() {
-  return HtmlService
-    .createHtmlOutputFromFile("Index")
-    .setTitle("Form Management System")
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-}
+// ==========================================
+// DATA
+// ==========================================
+
+let records = [];
 
 
+// ==========================================
+// PAGE LOAD
+// ==========================================
 
-function getSheet() {
-  const ss = SpreadsheetApp.openById(
-    "17QhNk6Ap-LLYqpiP596p4nFelV385iVpUGh9zvsoLPs"
-  );
+document.addEventListener(
+  "DOMContentLoaded",
+  function () {
 
-  let sheet = ss.getSheetByName("Form Management System");
+    loadRecords();
 
-  if (!sheet) {
-    sheet = ss.insertSheet("Form Management System");
+    setupForm();
 
-    sheet.getRange("A1:G1").setValues([[
-      "ID",
-      "Name",
-      "Email",
-      "Phone",
-      "Status",
-      "Created At",
-      "Updated At"
-    ]]);
+    setupSearch();
 
-    sheet.getRange("A1:G1")
-      .setFontWeight("bold")
-      .setBackground("#2563eb")
-      .setFontColor("#ffffff");
-
-    sheet.setFrozenRows(1);
   }
-
-  return sheet;
-}
-
-/**
- * READ
- * Get all records
- */
-function getRecords() {
-  const sheet = getSheet();
-  const lastRow = sheet.getLastRow();
-
-  if (lastRow <= 1) {
-    return [];
-  }
-
-  const data = sheet
-    .getRange(2, 1, lastRow - 1, 7)
-    .getValues();
-
-  return data.map(function(row) {
-    return {
-      id: row[0],
-      name: row[1],
-      email: row[2],
-      phone: row[3],
-      status: row[4],
-      createdAt: formatDate(row[5]),
-      updatedAt: formatDate(row[6])
-    };
-  });
-}
+);
 
 
-/**
- * CREATE
- * Add a new record
- */
-function createRecord(data) {
+// ==========================================
+// LOAD RECORDS
+// ==========================================
 
-  if (!data) {
-    throw new Error("No data received.");
-  }
+async function loadRecords() {
 
-  if (!data.name) {
-    throw new Error("Name is required.");
-  }
+  showLoading(true);
 
-  if (!data.email) {
-    throw new Error("Email is required.");
-  }
+  try {
 
-  const sheet = getSheet();
-
-  const id = "REC-" + new Date().getTime();
-  const now = new Date();
-
-  sheet.appendRow([
-    id,
-    data.name,
-    data.email,
-    data.phone || "",
-    data.status || "Active",
-    now,
-    now
-  ]);
-
-  return {
-    success: true,
-    message: "Record successfully created."
-  };
-}
+    const response =
+      await fetch(
+        API_URL +
+        "?action=getRecords"
+      );
 
 
-/**
- * UPDATE
- * Update an existing record
- */
-function updateRecord(data) {
-
-  if (!data || !data.id) {
-    throw new Error("Record ID is required.");
-  }
-
-  const sheet = getSheet();
-  const row = findRowById(data.id);
-
-  if (row === -1) {
-    throw new Error("Record not found.");
-  }
-
-  const createdAt = sheet.getRange(row, 6).getValue();
-
-  sheet.getRange(row, 1, 1, 7).setValues([[
-    data.id,
-    data.name || "",
-    data.email || "",
-    data.phone || "",
-    data.status || "Active",
-    createdAt,
-    new Date()
-  ]]);
-
-  return {
-    success: true,
-    message: "Record successfully updated."
-  };
-}
+    const data =
+      await response.json();
 
 
-/**
- * DELETE
- * Delete a record
- */
-function deleteRecord(id) {
+    if (
+      !Array.isArray(data)
+    ) {
 
-  if (!id) {
-    throw new Error("Record ID is required.");
-  }
+      throw new Error(
+        "Invalid response from server."
+      );
 
-  const sheet = getSheet();
-  const row = findRowById(id);
-
-  if (row === -1) {
-    throw new Error("Record not found.");
-  }
-
-  sheet.deleteRow(row);
-
-  return {
-    success: true,
-    message: "Record successfully deleted."
-  };
-}
-
-
-/**
- * Find spreadsheet row using ID
- */
-function findRowById(id) {
-
-  const sheet = getSheet();
-  const lastRow = sheet.getLastRow();
-
-  if (lastRow <= 1) {
-    return -1;
-  }
-
-  const ids = sheet
-    .getRange(2, 1, lastRow - 1, 1)
-    .getValues();
-
-  for (let i = 0; i < ids.length; i++) {
-
-    if (String(ids[i][0]) === String(id)) {
-      return i + 2;
     }
 
-  }
 
-  return -1;
-}
+    records =
+      data;
 
 
-/**
- * Format date/time
- */
-function formatDate(value) {
-
-  if (!value) {
-    return "";
-  }
-
-  if (Object.prototype.toString.call(value) === "[object Date]") {
-
-    return Utilities.formatDate(
-      value,
-      Session.getScriptTimeZone(),
-      "yyyy-MM-dd HH:mm:ss"
+    renderRecords(
+      records
     );
 
   }
 
-  return String(value);
+  catch (error) {
+
+    console.error(error);
+
+    showMessage(
+      "Failed to load records: " +
+      error.message,
+      "error"
+    );
+
+  }
+
+  finally {
+
+    showLoading(false);
+
+  }
+
 }
 
+
+// ==========================================
+// CREATE
+// ==========================================
+
+async function createRecord(
+  data
+) {
+
+  try {
+
+    const params =
+      new URLSearchParams();
+
+
+    params.append(
+      "action",
+      "create"
+    );
+
+
+    params.append(
+      "name",
+      data.name
+    );
+
+
+    params.append(
+      "email",
+      data.email
+    );
+
+
+    params.append(
+      "phone",
+      data.phone
+    );
+
+
+    params.append(
+      "status",
+      data.status
+    );
+
+
+    const response =
+      await fetch(
+        API_URL,
+        {
+          method: "POST",
+
+          body: params
+        }
+      );
+
+
+    const result =
+      await response.json();
+
+
+    if (!result.success) {
+
+      throw new Error(
+        result.message
+      );
+
+    }
+
+
+    showMessage(
+      result.message,
+      "success"
+    );
+
+
+    resetForm();
+
+
+    await loadRecords();
+
+  }
+
+  catch (error) {
+
+    console.error(error);
+
+    showMessage(
+      error.message,
+      "error"
+    );
+
+  }
+
+}
+
+
+// ==========================================
+// UPDATE
+// ==========================================
+
+async function updateRecord(
+  data
+) {
+
+  try {
+
+    const params =
+      new URLSearchParams();
+
+
+    params.append(
+      "action",
+      "update"
+    );
+
+
+    params.append(
+      "id",
+      data.id
+    );
+
+
+    params.append(
+      "name",
+      data.name
+    );
+
+
+    params.append(
+      "email",
+      data.email
+    );
+
+
+    params.append(
+      "phone",
+      data.phone
+    );
+
+
+    params.append(
+      "status",
+      data.status
+    );
+
+
+    const response =
+      await fetch(
+        API_URL,
+        {
+          method: "POST",
+
+          body: params
+        }
+      );
+
+
+    const result =
+      await response.json();
+
+
+    if (!result.success) {
+
+      throw new Error(
+        result.message
+      );
+
+    }
+
+
+    showMessage(
+      result.message,
+      "success"
+    );
+
+
+    resetForm();
+
+
+    await loadRecords();
+
+  }
+
+  catch (error) {
+
+    console.error(error);
+
+    showMessage(
+      error.message,
+      "error"
+    );
+
+  }
+
+}
+
+
+// ==========================================
+// DELETE
+// ==========================================
+
+async function deleteRecord(
+  id
+) {
+
+  if (
+    !confirm(
+      "Are you sure you want to delete this record?"
+    )
+  ) {
+
+    return;
+
+  }
+
+
+  try {
+
+    const params =
+      new URLSearchParams();
+
+
+    params.append(
+      "action",
+      "delete"
+    );
+
+
+    params.append(
+      "id",
+      id
+    );
+
+
+    const response =
+      await fetch(
+        API_URL,
+        {
+          method: "POST",
+
+          body: params
+        }
+      );
+
+
+    const result =
+      await response.json();
+
+
+    if (!result.success) {
+
+      throw new Error(
+        result.message
+      );
+
+    }
+
+
+    showMessage(
+      result.message,
+      "success"
+    );
+
+
+    await loadRecords();
+
+  }
+
+  catch (error) {
+
+    console.error(error);
+
+    showMessage(
+      error.message,
+      "error"
+    );
+
+  }
+
+}
+
+
+// ==========================================
+// FORM
+// ==========================================
+
+function setupForm() {
+
+  const form =
+    document.getElementById(
+      "recordForm"
+    );
+
+
+  form.addEventListener(
+    "submit",
+    function (event) {
+
+      event.preventDefault();
+
+
+      const id =
+        document.getElementById(
+          "recordId"
+        ).value;
+
+
+      const data = {
+
+        id: id,
+
+        name:
+          document.getElementById(
+            "name"
+          ).value.trim(),
+
+        email:
+          document.getElementById(
+            "email"
+          ).value.trim(),
+
+        phone:
+          document.getElementById(
+            "phone"
+          ).value.trim(),
+
+        status:
+          document.getElementById(
+            "status"
+          ).value
+
+      };
+
+
+      if (!data.name) {
+
+        showMessage(
+          "Name is required.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      if (!data.email) {
+
+        showMessage(
+          "Email is required.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      const button =
+        document.getElementById(
+          "submitButton"
+        );
+
+
+      button.disabled =
+        true;
+
+
+      if (id) {
+
+        updateRecord(
+          data
+        );
+
+      }
+
+      else {
+
+        createRecord(
+          data
+        );
+
+      }
+
+
+      setTimeout(
+        function () {
+
+          button.disabled =
+            false;
+
+        },
+        1000
+      );
+
+    }
+  );
+
+}
+
+
+// ==========================================
+// EDIT
+// ==========================================
+
+function editRecord(
+  id
+) {
+
+  const record =
+    records.find(
+      function (item) {
+
+        return String(
+          item.id
+        ) === String(id);
+
+      }
+    );
+
+
+  if (!record) {
+
+    showMessage(
+      "Record not found.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  document.getElementById(
+    "recordId"
+  ).value =
+    record.id;
+
+
+  document.getElementById(
+    "name"
+  ).value =
+    record.name;
+
+
+  document.getElementById(
+    "email"
+  ).value =
+    record.email;
+
+
+  document.getElementById(
+    "phone"
+  ).value =
+    record.phone;
+
+
+  document.getElementById(
+    "status"
+  ).value =
+    record.status;
+
+
+  document.getElementById(
+    "submitButton"
+  ).textContent =
+    "Update Record";
+
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+}
+
+
+// ==========================================
+// RESET
+// ==========================================
+
+function resetForm() {
+
+  document
+    .getElementById(
+      "recordForm"
+    )
+    .reset();
+
+
+  document.getElementById(
+    "recordId"
+  ).value = "";
+
+
+  document.getElementById(
+    "status"
+  ).value =
+    "Active";
+
+
+  document.getElementById(
+    "submitButton"
+  ).textContent =
+    "Add Record";
+
+
+  document.getElementById(
+    "submitButton"
+  ).disabled =
+    false;
+
+}
+
+
+// ==========================================
+// SEARCH
+// ==========================================
+
+function setupSearch() {
+
+  document
+    .getElementById(
+      "searchInput"
+    )
+    .addEventListener(
+      "input",
+      searchRecords
+    );
+
+}
+
+
+function searchRecords() {
+
+  const search =
+    document
+      .getElementById(
+        "searchInput"
+      )
+      .value
+      .toLowerCase()
+      .trim();
+
+
+  if (!search) {
+
+    renderRecords(
+      records
+    );
+
+    return;
+
+  }
+
+
+  const filtered =
+    records.filter(
+      function (record) {
+
+        return (
+
+          String(
+            record.id
+          )
+            .toLowerCase()
+            .includes(search)
+
+          ||
+
+          String(
+            record.name
+          )
+            .toLowerCase()
+            .includes(search)
+
+          ||
+
+          String(
+            record.email
+          )
+            .toLowerCase()
+            .includes(search)
+
+          ||
+
+          String(
+            record.phone
+          )
+            .toLowerCase()
+            .includes(search)
+
+          ||
+
+          String(
+            record.status
+          )
+            .toLowerCase()
+            .includes(search)
+
+        );
+
+      }
+    );
+
+
+  renderRecords(
+    filtered
+  );
+
+}
+
+
+// ==========================================
+// RENDER TABLE
+// ==========================================
+
+function renderRecords(
+  data
+) {
+
+  const table =
+    document.getElementById(
+      "recordTable"
+    );
+
+
+  table.innerHTML =
+    "";
+
+
+  if (
+    !data ||
+    data.length === 0
+  ) {
+
+    table.innerHTML = `
+
+      <tr>
+
+        <td
+          colspan="7"
+          class="empty"
+        >
+          No records found.
+        </td>
+
+      </tr>
+
+    `;
+
+    return;
+
+  }
+
+
+  data.forEach(
+    function (record) {
+
+      const row =
+        document.createElement(
+          "tr"
+        );
+
+
+      const statusClass =
+        record.status ===
+        "Active"
+
+          ? "status-active"
+
+          : "status-inactive";
+
+
+      row.innerHTML = `
+
+        <td>
+          ${escapeHtml(
+            record.id
+          )}
+        </td>
+
+        <td>
+          ${escapeHtml(
+            record.name
+          )}
+        </td>
+
+        <td>
+          ${escapeHtml(
+            record.email
+          )}
+        </td>
+
+        <td>
+          ${escapeHtml(
+            record.phone
+          )}
+        </td>
+
+        <td>
+
+          <span
+            class="status ${statusClass}"
+          >
+            ${escapeHtml(
+              record.status
+            )}
+          </span>
+
+        </td>
+
+        <td>
+          ${escapeHtml(
+            record.createdAt
+          )}
+        </td>
+
+        <td>
+
+          <div class="action-buttons">
+
+            <button
+              class="btn-edit"
+              onclick="editRecord('${escapeJs(record.id)}')"
+            >
+              Edit
+            </button>
+
+            <button
+              class="btn-delete"
+              onclick="deleteRecord('${escapeJs(record.id)}')"
+            >
+              Delete
+            </button>
+
+          </div>
+
+        </td>
+
+      `;
+
+
+      table.appendChild(
+        row
+      );
+
+    }
+  );
+
+}
+
+
+// ==========================================
+// LOADING
+// ==========================================
+
+function showLoading(
+  show
+) {
+
+  const loading =
+    document.getElementById(
+      "loading"
+    );
+
+
+  loading.style.display =
+    show
+      ? "block"
+      : "none";
+
+}
+
+
+// ==========================================
+// MESSAGE
+// ==========================================
+
+function showMessage(
+  message,
+  type
+) {
+
+  const element =
+    document.getElementById(
+      "message"
+    );
+
+
+  if (!element) {
+
+    alert(message);
+
+    return;
+
+  }
+
+
+  element.textContent =
+    message;
+
+
+  element.className =
+    type;
+
+
+  element.style.display =
+    "block";
+
+
+  setTimeout(
+    function () {
+
+      element.style.display =
+        "none";
+
+    },
+    3500
+  );
+
+}
+
+
+// ==========================================
+// SECURITY
+// ==========================================
+
+function escapeHtml(
+  value
+) {
+
+  if (
+    value === null ||
+    value === undefined
+  ) {
+
+    return "";
+
+  }
+
+
+  return String(value)
+
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    )
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+function escapeJs(
+  value
+) {
+
+  return String(value)
+
+    .replace(
+      /\\/g,
+      "\\\\"
+    )
+
+    .replace(
+      /'/g,
+      "\\'"
+    );
+
+}
+```
