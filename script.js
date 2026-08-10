@@ -1,86 +1,90 @@
-
-// ==========================================
-// GOOGLE APPS SCRIPT API URL
-// ==========================================
+```javascript
+// =====================================================
+// GOOGLE APPS SCRIPT WEB APP URL
+// =====================================================
 
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbx498HUtPGFoEjK8-az6gqbb4bnmPOClU_szltWQ57AN0iSxAll6BRnetreqDG1YNI0/exec";
+  "https://script.google.com/macros/s/AKfycbxbFsfTXx_sUWkYKLWOMdlP67RCrZpIh6s_AOWsXozsvYDRuddDXCwAzNkMVjix-9kP/exec";
 
 
-// ==========================================
-// DATA
-// ==========================================
-const SHEET_NAME = "Form Management System";
+// =====================================================
+// GLOBAL DATA
+// =====================================================
 
 let records = [];
+let editingId = null;
 
 
-// ==========================================
+// =====================================================
 // PAGE LOAD
-// ==========================================
+// =====================================================
 
-document.addEventListener(
-  "DOMContentLoaded",
-  function () {
+document.addEventListener("DOMContentLoaded", () => {
 
-    loadRecords();
+  loadRecords();
 
-    setupForm();
+  const form =
+    document.getElementById("recordForm");
 
-    setupSearch();
-
+  if (form) {
+    form.addEventListener(
+      "submit",
+      handleSubmit
+    );
   }
-);
+
+});
 
 
-// ==========================================
-// LOAD RECORDS
-// ==========================================
+// =====================================================
+// GET RECORDS
+// =====================================================
 
 async function loadRecords() {
 
-  showLoading(true);
+  const loading =
+    document.getElementById("loading");
+
+  if (loading) {
+    loading.style.display = "block";
+  }
 
   try {
 
-    const response =
-      await fetch(
-        API_URL +
-        "?action=getRecords"
-      );
+    const response = await fetch(
+      API_URL + "?action=getRecords"
+    );
 
-
-    const data =
+    const result =
       await response.json();
 
+    console.log("GET RESPONSE:", result);
 
-    if (
-      !Array.isArray(data)
-    ) {
+    if (!result.success) {
 
       throw new Error(
-        "Invalid response from server."
+        result.message ||
+        "Unable to get records."
       );
 
     }
 
-
     records =
-      data;
+      result.records || [];
 
-
-    renderRecords(
-      records
-    );
+    displayRecords(records);
 
   }
 
   catch (error) {
 
-    console.error(error);
+    console.error(
+      "Load error:",
+      error
+    );
 
     showMessage(
-      "Failed to load records: " +
+      "Unable to load records: " +
       error.message,
       "error"
     );
@@ -89,253 +93,152 @@ async function loadRecords() {
 
   finally {
 
-    showLoading(false);
-
-  }
-
-}
-
-
-// ==========================================
-// CREATE
-// ==========================================
-
-async function createRecord(
-  data
-) {
-
-  try {
-
-    const params =
-      new URLSearchParams();
-
-
-    params.append(
-      "action",
-      "create"
-    );
-
-
-    params.append(
-      "name",
-      data.name
-    );
-
-
-    params.append(
-      "email",
-      data.email
-    );
-
-
-    params.append(
-      "phone",
-      data.phone
-    );
-
-
-    params.append(
-      "status",
-      data.status
-    );
-
-
-    const response =
-      await fetch(
-        API_URL,
-        {
-          method: "POST",
-
-          body: params
-        }
-      );
-
-
-    const result =
-      await response.json();
-
-
-    if (!result.success) {
-
-      throw new Error(
-        result.message
-      );
-
+    if (loading) {
+      loading.style.display = "none";
     }
 
-
-    showMessage(
-      result.message,
-      "success"
-    );
-
-
-    resetForm();
-
-
-    await loadRecords();
-
-  }
-
-  catch (error) {
-
-    console.error(error);
-
-    showMessage(
-      error.message,
-      "error"
-    );
-
   }
 
 }
 
 
-// ==========================================
-// UPDATE
-// ==========================================
+// =====================================================
+// CREATE / UPDATE
+// =====================================================
 
-async function updateRecord(
-  data
-) {
+async function handleSubmit(event) {
 
-  try {
-
-    const params =
-      new URLSearchParams();
+  event.preventDefault();
 
 
-    params.append(
-      "action",
-      "update"
-    );
+  const id =
+    document.getElementById(
+      "recordId"
+    ).value.trim();
 
 
-    params.append(
-      "id",
-      data.id
-    );
+  const name =
+    document.getElementById(
+      "name"
+    ).value.trim();
 
 
-    params.append(
-      "name",
-      data.name
-    );
+  const email =
+    document.getElementById(
+      "email"
+    ).value.trim();
 
 
-    params.append(
-      "email",
-      data.email
-    );
+  const phone =
+    document.getElementById(
+      "phone"
+    ).value.trim();
 
 
-    params.append(
-      "phone",
-      data.phone
-    );
+  const status =
+    document.getElementById(
+      "status"
+    ).value;
 
 
-    params.append(
-      "status",
-      data.status
-    );
-
-
-    const response =
-      await fetch(
-        API_URL,
-        {
-          method: "POST",
-
-          body: params
-        }
-      );
-
-
-    const result =
-      await response.json();
-
-
-    if (!result.success) {
-
-      throw new Error(
-        result.message
-      );
-
-    }
-
+  if (!name) {
 
     showMessage(
-      result.message,
-      "success"
-    );
-
-
-    resetForm();
-
-
-    await loadRecords();
-
-  }
-
-  catch (error) {
-
-    console.error(error);
-
-    showMessage(
-      error.message,
+      "Name is required.",
       "error"
     );
-
-  }
-
-}
-
-
-// ==========================================
-// DELETE
-// ==========================================
-
-async function deleteRecord(
-  id
-) {
-
-  if (
-    !confirm(
-      "Are you sure you want to delete this record?"
-    )
-  ) {
 
     return;
 
   }
 
 
-  try {
+  if (!email) {
 
-    const params =
-      new URLSearchParams();
-
-
-    params.append(
-      "action",
-      "delete"
+    showMessage(
+      "Email is required.",
+      "error"
     );
 
+    return;
 
-    params.append(
+  }
+
+
+  const action =
+    id ? "update" : "create";
+
+
+  const formData =
+    new URLSearchParams();
+
+
+  formData.append(
+    "action",
+    action
+  );
+
+
+  if (id) {
+
+    formData.append(
       "id",
       id
     );
 
+  }
+
+
+  formData.append(
+    "name",
+    name
+  );
+
+
+  formData.append(
+    "email",
+    email
+  );
+
+
+  formData.append(
+    "phone",
+    phone
+  );
+
+
+  formData.append(
+    "status",
+    status
+  );
+
+
+  const button =
+    document.getElementById(
+      "submitButton"
+    );
+
+
+  if (button) {
+
+    button.disabled = true;
+
+    button.textContent =
+      action === "create"
+        ? "Saving..."
+        : "Updating...";
+
+  }
+
+
+  try {
 
     const response =
       await fetch(
         API_URL,
         {
           method: "POST",
-
-          body: params
+          body: formData
         }
       );
 
@@ -344,10 +247,17 @@ async function deleteRecord(
       await response.json();
 
 
+    console.log(
+      "POST RESPONSE:",
+      result
+    );
+
+
     if (!result.success) {
 
       throw new Error(
-        result.message
+        result.message ||
+        "Operation failed."
       );
 
     }
@@ -359,160 +269,55 @@ async function deleteRecord(
     );
 
 
+    resetForm();
+
+
     await loadRecords();
 
   }
 
   catch (error) {
 
-    console.error(error);
+    console.error(
+      "Save error:",
+      error
+    );
 
     showMessage(
+      "Error: " +
       error.message,
       "error"
     );
 
   }
 
-}
+  finally {
 
+    if (button) {
 
-// ==========================================
-// FORM
-// ==========================================
+      button.disabled = false;
 
-function setupForm() {
-
-  const form =
-    document.getElementById(
-      "recordForm"
-    );
-
-
-  form.addEventListener(
-    "submit",
-    function (event) {
-
-      event.preventDefault();
-
-
-      const id =
-        document.getElementById(
-          "recordId"
-        ).value;
-
-
-      const data = {
-
-        id: id,
-
-        name:
-          document.getElementById(
-            "name"
-          ).value.trim(),
-
-        email:
-          document.getElementById(
-            "email"
-          ).value.trim(),
-
-        phone:
-          document.getElementById(
-            "phone"
-          ).value.trim(),
-
-        status:
-          document.getElementById(
-            "status"
-          ).value
-
-      };
-
-
-      if (!data.name) {
-
-        showMessage(
-          "Name is required.",
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      if (!data.email) {
-
-        showMessage(
-          "Email is required.",
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      const button =
-        document.getElementById(
-          "submitButton"
-        );
-
-
-      button.disabled =
-        true;
-
-
-      if (id) {
-
-        updateRecord(
-          data
-        );
-
-      }
-
-      else {
-
-        createRecord(
-          data
-        );
-
-      }
-
-
-      setTimeout(
-        function () {
-
-          button.disabled =
-            false;
-
-        },
-        1000
-      );
+      button.textContent =
+        "Add Record";
 
     }
-  );
+
+  }
 
 }
 
 
-// ==========================================
-// EDIT
-// ==========================================
+// =====================================================
+// EDIT RECORD
+// =====================================================
 
-function editRecord(
-  id
-) {
+function editRecord(id) {
 
   const record =
     records.find(
-      function (item) {
-
-        return String(
-          item.id
-        ) === String(id);
-
-      }
+      item =>
+        String(item.id) ===
+        String(id)
     );
 
 
@@ -537,184 +342,150 @@ function editRecord(
   document.getElementById(
     "name"
   ).value =
-    record.name;
+    record.name || "";
 
 
   document.getElementById(
     "email"
   ).value =
-    record.email;
+    record.email || "";
 
 
   document.getElementById(
     "phone"
   ).value =
-    record.phone;
+    record.phone || "";
 
 
   document.getElementById(
     "status"
   ).value =
-    record.status;
+    record.status || "Active";
 
 
-  document.getElementById(
-    "submitButton"
-  ).textContent =
-    "Update Record";
+  const button =
+    document.getElementById(
+      "submitButton"
+    );
+
+
+  if (button) {
+
+    button.textContent =
+      "Update Record";
+
+  }
 
 
   window.scrollTo({
+
     top: 0,
+
     behavior: "smooth"
+
   });
 
 }
 
 
-// ==========================================
-// RESET
-// ==========================================
+// =====================================================
+// DELETE RECORD
+// =====================================================
 
-function resetForm() {
+async function deleteRecord(id) {
 
-  document
-    .getElementById(
-      "recordForm"
-    )
-    .reset();
-
-
-  document.getElementById(
-    "recordId"
-  ).value = "";
-
-
-  document.getElementById(
-    "status"
-  ).value =
-    "Active";
-
-
-  document.getElementById(
-    "submitButton"
-  ).textContent =
-    "Add Record";
-
-
-  document.getElementById(
-    "submitButton"
-  ).disabled =
-    false;
-
-}
-
-
-// ==========================================
-// SEARCH
-// ==========================================
-
-function setupSearch() {
-
-  document
-    .getElementById(
-      "searchInput"
-    )
-    .addEventListener(
-      "input",
-      searchRecords
+  const confirmed =
+    confirm(
+      "Are you sure you want to delete this record?"
     );
 
-}
 
-
-function searchRecords() {
-
-  const search =
-    document
-      .getElementById(
-        "searchInput"
-      )
-      .value
-      .toLowerCase()
-      .trim();
-
-
-  if (!search) {
-
-    renderRecords(
-      records
-    );
-
+  if (!confirmed) {
     return;
-
   }
 
 
-  const filtered =
-    records.filter(
-      function (record) {
+  const formData =
+    new URLSearchParams();
 
-        return (
 
-          String(
-            record.id
-          )
-            .toLowerCase()
-            .includes(search)
+  formData.append(
+    "action",
+    "delete"
+  );
 
-          ||
 
-          String(
-            record.name
-          )
-            .toLowerCase()
-            .includes(search)
+  formData.append(
+    "id",
+    id
+  );
 
-          ||
 
-          String(
-            record.email
-          )
-            .toLowerCase()
-            .includes(search)
+  try {
 
-          ||
+    const response =
+      await fetch(
+        API_URL,
+        {
+          method: "POST",
+          body: formData
+        }
+      );
 
-          String(
-            record.phone
-          )
-            .toLowerCase()
-            .includes(search)
 
-          ||
+    const result =
+      await response.json();
 
-          String(
-            record.status
-          )
-            .toLowerCase()
-            .includes(search)
 
-        );
-
-      }
+    console.log(
+      "DELETE RESPONSE:",
+      result
     );
 
 
-  renderRecords(
-    filtered
-  );
+    if (!result.success) {
+
+      throw new Error(
+        result.message ||
+        "Delete failed."
+      );
+
+    }
+
+
+    showMessage(
+      result.message,
+      "success"
+    );
+
+
+    await loadRecords();
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "Delete error:",
+      error
+    );
+
+    showMessage(
+      "Delete failed: " +
+      error.message,
+      "error"
+    );
+
+  }
 
 }
 
 
-// ==========================================
-// RENDER TABLE
-// ==========================================
+// =====================================================
+// DISPLAY RECORDS
+// =====================================================
 
-function renderRecords(
-  data
-) {
+function displayRecords(data) {
 
   const table =
     document.getElementById(
@@ -722,8 +493,12 @@ function renderRecords(
     );
 
 
-  table.innerHTML =
-    "";
+  if (!table) {
+    return;
+  }
+
+
+  table.innerHTML = "";
 
 
   if (
@@ -737,7 +512,7 @@ function renderRecords(
 
         <td
           colspan="7"
-          class="empty"
+          style="text-align:center;"
         >
           No records found.
         </td>
@@ -751,145 +526,229 @@ function renderRecords(
   }
 
 
-  data.forEach(
-    function (record) {
+  data.forEach(record => {
 
-      const row =
-        document.createElement(
-          "tr"
-        );
+    const row =
+      document.createElement("tr");
 
 
-      const statusClass =
-        record.status ===
-        "Active"
+    row.innerHTML = `
 
-          ? "status-active"
+      <td>
+        ${escapeHtml(record.id)}
+      </td>
 
-          : "status-inactive";
+      <td>
+        ${escapeHtml(record.name)}
+      </td>
 
+      <td>
+        ${escapeHtml(record.email)}
+      </td>
 
-      row.innerHTML = `
+      <td>
+        ${escapeHtml(record.phone)}
+      </td>
 
-        <td>
-          ${escapeHtml(
-            record.id
-          )}
-        </td>
+      <td>
+        ${escapeHtml(record.status)}
+      </td>
 
-        <td>
-          ${escapeHtml(
-            record.name
-          )}
-        </td>
+      <td>
+        ${escapeHtml(record.createdAt)}
+      </td>
 
-        <td>
-          ${escapeHtml(
-            record.email
-          )}
-        </td>
+      <td>
 
-        <td>
-          ${escapeHtml(
-            record.phone
-          )}
-        </td>
+        <button
+          type="button"
+          onclick="editRecord('${escapeJs(record.id)}')"
+        >
+          Edit
+        </button>
 
-        <td>
+        <button
+          type="button"
+          onclick="deleteRecord('${escapeJs(record.id)}')"
+        >
+          Delete
+        </button>
 
-          <span
-            class="status ${statusClass}"
-          >
-            ${escapeHtml(
-              record.status
-            )}
-          </span>
+      </td>
 
-        </td>
-
-        <td>
-          ${escapeHtml(
-            record.createdAt
-          )}
-        </td>
-
-        <td>
-
-          <div class="action-buttons">
-
-            <button
-              class="btn-edit"
-              onclick="editRecord('${escapeJs(record.id)}')"
-            >
-              Edit
-            </button>
-
-            <button
-              class="btn-delete"
-              onclick="deleteRecord('${escapeJs(record.id)}')"
-            >
-              Delete
-            </button>
-
-          </div>
-
-        </td>
-
-      `;
+    `;
 
 
-      table.appendChild(
-        row
-      );
+    table.appendChild(row);
 
-    }
-  );
+  });
 
 }
 
 
-// ==========================================
-// LOADING
-// ==========================================
+// =====================================================
+// SEARCH
+// =====================================================
 
-function showLoading(
-  show
-) {
+function searchRecords() {
 
-  const loading =
+  const input =
     document.getElementById(
-      "loading"
+      "searchInput"
     );
 
 
-  loading.style.display =
-    show
-      ? "block"
-      : "none";
+  if (!input) {
+    return;
+  }
+
+
+  const keyword =
+    input.value
+      .toLowerCase()
+      .trim();
+
+
+  if (!keyword) {
+
+    displayRecords(records);
+
+    return;
+
+  }
+
+
+  const filtered =
+    records.filter(record => {
+
+      return (
+
+        String(record.id)
+          .toLowerCase()
+          .includes(keyword)
+
+        ||
+
+        String(record.name)
+          .toLowerCase()
+          .includes(keyword)
+
+        ||
+
+        String(record.email)
+          .toLowerCase()
+          .includes(keyword)
+
+        ||
+
+        String(record.phone)
+          .toLowerCase()
+          .includes(keyword)
+
+        ||
+
+        String(record.status)
+          .toLowerCase()
+          .includes(keyword)
+
+      );
+
+    });
+
+
+  displayRecords(filtered);
 
 }
 
 
-// ==========================================
+// =====================================================
+// RESET FORM
+// =====================================================
+
+function resetForm() {
+
+  const form =
+    document.getElementById(
+      "recordForm"
+    );
+
+
+  if (form) {
+    form.reset();
+  }
+
+
+  const id =
+    document.getElementById(
+      "recordId"
+    );
+
+
+  if (id) {
+    id.value = "";
+  }
+
+
+  const status =
+    document.getElementById(
+      "status"
+    );
+
+
+  if (status) {
+    status.value = "Active";
+  }
+
+
+  const button =
+    document.getElementById(
+      "submitButton"
+    );
+
+
+  if (button) {
+
+    button.textContent =
+      "Add Record";
+
+    button.disabled = false;
+
+  }
+
+}
+
+
+// =====================================================
 // MESSAGE
-// ==========================================
+// =====================================================
 
 function showMessage(
   message,
   type
 ) {
 
-  const element =
+  let element =
     document.getElementById(
       "message"
     );
 
 
+  // Create message element
+  // if it doesn't exist.
+
   if (!element) {
 
-    alert(message);
+    element =
+      document.createElement(
+        "div"
+      );
 
-    return;
+    element.id =
+      "message";
+
+    document.body.prepend(
+      element
+    );
 
   }
 
@@ -899,33 +758,28 @@ function showMessage(
 
 
   element.className =
-    type;
+    "message " + type;
 
 
   element.style.display =
     "block";
 
 
-  setTimeout(
-    function () {
+  setTimeout(() => {
 
-      element.style.display =
-        "none";
+    element.style.display =
+      "none";
 
-    },
-    3500
-  );
+  }, 4000);
 
 }
 
 
-// ==========================================
-// SECURITY
-// ==========================================
+// =====================================================
+// ESCAPE HTML
+// =====================================================
 
-function escapeHtml(
-  value
-) {
+function escapeHtml(value) {
 
   if (
     value === null ||
@@ -967,9 +821,11 @@ function escapeHtml(
 }
 
 
-function escapeJs(
-  value
-) {
+// =====================================================
+// ESCAPE JAVASCRIPT
+// =====================================================
+
+function escapeJs(value) {
 
   return String(value)
 
@@ -984,3 +840,4 @@ function escapeJs(
     );
 
 }
+```
